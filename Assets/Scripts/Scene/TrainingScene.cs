@@ -7,7 +7,7 @@ public class TrainingScene : BaseScene
     //[SerializeField] Player player;
     //[SerializeField] RingGauge ringGauge;
 
-    [SerializeField] GameObject answerBox;
+    //[SerializeField] BoxBehaviour answerBox;
     [SerializeField] Transform questionTrans;
     [SerializeField] Transform choiceTrans;
 
@@ -23,7 +23,7 @@ public class TrainingScene : BaseScene
         //Managers.Instance.SetUiManager(uiManager);
         //Managers.Instance.SetObjectManager(objectManager);
 
-        Managers.Game.answerBox = answerBox;
+        //Managers.Game.answerBox = answerBox;
         Managers.Game.questionTrans = questionTrans;
         Managers.Game.choiceTrans = choiceTrans;
 

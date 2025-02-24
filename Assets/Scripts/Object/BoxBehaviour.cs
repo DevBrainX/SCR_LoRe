@@ -6,12 +6,23 @@ public enum BoxType
 {
     Question, // 문제 (이동 불가능)
     Choice, // 선택지 (정답, 오답 둘 다 가능)
-    //Answer, // 정답을 집어넣는 칸
+    Answer, // 정답을 집어넣는 칸
 }
+
+public enum ObjectCategory
+{
+    Carnivore = 0,  // 동물-육식
+    Herbivore,      // 동물-초식
+    Fish,           // 해양-물고기
+    MarineMammal,    // 해양-포유류
+}
+
+
 
 public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 {
-    [SerializeField] SpriteRenderer image;
+    public SpriteRenderer image;
+    public SpriteRenderer outline;
 
     int spriteIndex;
     int colorIndex;
@@ -38,14 +49,14 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
         boxCollider = GetComponent<BoxCollider2D>();
 
-        if (type == BoxType.Choice)
-        {
-            boxCollider.enabled = true;
-        }
-        else
-        {
-            boxCollider.enabled = false;
-        }
+        //if (type == BoxType.Choice)
+        //{
+        //    boxCollider.enabled = true;
+        //}
+        //else
+        //{
+        //    boxCollider.enabled = false;
+        //}
 
         transform.localPosition = oriLocalPos;
 
@@ -57,10 +68,32 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         type = _type;
         oriLocalPos = _oriLocalPos;
         color = _color;
+
+        image.transform.localScale = new Vector3(100f / 512f, 100f / 512f, 1f);
+
+        if (type == BoxType.Answer)
+        {
+            outline.gameObject.SetActive(true);
+        }
+        else
+        {
+            outline.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetSprite(SpriteRenderer _image)
+    {
+        image.sprite = _image.sprite;
+        image.color = _image.color;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (type != BoxType.Choice)
+        {
+            return;
+        }
+
         // 마우스 화면 좌표를 월드 좌표로 변환
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
         mouseWorldPos.z = m_ZCoord;
@@ -70,16 +103,21 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (type != BoxType.Choice)
+        {
+            return;
+        }
+
         // 마우스 화면 좌표를 월드 좌표로 변환
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
         mouseWorldPos.z = 0; // 2D 게임에서는 z 축을 0으로 설정
 
-        GameObject answerBox = Managers.Game.answerBox;
+        BoxBehaviour answerBox = Managers.Game.answerBox;
 
         // 정답박스에 마우스 들어가있으면 정답박스에 고정, 아니면 원래 위치로
         if (answerBox.GetComponent<BoxCollider2D>().OverlapPoint(mouseWorldPos))
         {
-            InsertInAnswerBox();
+            Managers.Game.InsertInAnswerBox(this);
         }
 
         SetOriginalPosition();
@@ -102,53 +140,20 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void OnDoubleClick()
     {
-        InsertInAnswerBox();
-    }
-
-    private void InsertInAnswerBox()
-    {
-        //GameObject answerObject = Managers.Game.answerBox;
-
-        AnswerBox answerBox = Managers.Game.answerBox.GetComponent<AnswerBox>();
-
-        //// 정답박스에 이미 들어있는지 확인
-        //if (answerObject.GetComponent<AnswerBox>().insertedBox != null)
-        //{
-        //    answerObject.GetComponent<AnswerBox>().insertedBox.gameObject.SetActive(true);
-        //}
-
-        // 정답박스에 이미 선택지 오브젝트 들어가있으면 다시 활성화
-        if (answerBox.currentChoiceIndex != -1)
+        if (type == BoxType.Answer)
         {
-            Managers.Game.choiceBoxList[answerBox.currentChoiceIndex].gameObject.SetActive(true);
+            Managers.Game.RemoveInAnswerBox();
         }
-
-        //answerObject.GetComponent<AnswerBox>().insertedBox = this;
-        answerBox.SetSprite(image);
-        answerBox.currentChoiceIndex = Managers.Game.choiceBoxList.IndexOf(this);
-        this.gameObject.SetActive(false);
+        else if (type == BoxType.Choice)
+        {
+            Managers.Game.InsertInAnswerBox(this);
+        }
     }
 
     public void SetOriginalPosition()
     {
         transform.localPosition = oriLocalPos;
     }
-
-    //void OnMouseDrag()
-    //{
-    //    Vector3 mousePos = Input.mousePosition;
-    //    mousePos.z = m_ZCoord;
-    //
-    //    transform.position = Camera.main.ScreenToWorldPoint(mousePos);
-    //}
-
-    //void OnMouseUp()
-    //{
-    //    Vector3 mousePos = Input.mousePosition;
-    //    mousePos.z = m_ZCoord;
-    //    //Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, transform.position.z);
-    //    transform.position = Camera.main.ScreenToWorldPoint(mousePos);
-    //}
 
     void Update()
     {
