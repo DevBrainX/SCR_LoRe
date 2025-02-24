@@ -40,7 +40,7 @@ public class AnswerBox : MonoBehaviour
     private void OnDoubleClick()
     {
         // 정답박스에 선택지 들어가있으면 빼기
-        if (currentChoiceIndex != -1)
+        if(currentChoiceIndex != -1)
         {
             Managers.Game.choiceBoxList[currentChoiceIndex].gameObject.SetActive(true);
 
@@ -49,5 +49,7 @@ public class AnswerBox : MonoBehaviour
 
             currentChoiceIndex = -1;
         }
+
+        //Debug.Log("더블 클릭 감지됨!");
     }
 }

@@ -13,6 +13,11 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     [SerializeField] SpriteRenderer image;
 
+    int spriteIndex;
+    int colorIndex;
+    int angleIndex;
+    int scaleIndex;
+
     BoxType type;
 
     Color color;

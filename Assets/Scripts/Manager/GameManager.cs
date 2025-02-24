@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
 
 
         // 문제 오브젝트 on
-        Vector2 spawnPos = new Vector2(-5, 0);
+        Vector3 spawnPos = new Vector3(-5, 0, 0);
         for (int i = 0; i < 4; ++i)
         {
             GameObject newBox = Instantiate(boxPrefab, questionTrans);
@@ -59,16 +59,34 @@ public class GameManager : MonoBehaviour
 
         // 정답 오브젝트 on 
         answerBox.SetActive(true);
-        
 
         // 선택지 오브젝트 on
-        spawnPos = new Vector2(-5, 0);
-        for (int i = 0; i < 4; ++i)
+        //float width = 920;
+        //float height = 200;
+        //float spawnWidth = 100;
+
+        // 부모 스프라이트의 크기 가져오기
+        SpriteRenderer parentSpriteRenderer = choiceTrans.GetComponent<SpriteRenderer>();
+        float pixelsPerUnit = parentSpriteRenderer.sprite.pixelsPerUnit;
+        float parentWidth = parentSpriteRenderer.sprite.bounds.size.x;
+        
+
+        // 부모의 중앙에서 시작하는 스크린 좌표계의 위치 계산
+        float xOffset = (100f / pixelsPerUnit) - (parentWidth / 2);
+
+        // spawnPos = new Vector3(parentWidth, 0, 0);
+
+        for (int i = 0; i < 7; ++i)
         {
             GameObject newBox = Instantiate(boxPrefab, choiceTrans);
             Color color = SetRandomColor();
-            Vector3 oriPos = new Vector3(spawnPos.x + (3 * i), spawnPos.y, 0);
-            newBox.GetComponent<BoxBehaviour>().Init(BoxType.Choice, color, oriPos);
+
+            // 자식 스프라이트의 크기
+            float childWidth = newBox.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+
+            spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 10);
+
+            newBox.GetComponent<BoxBehaviour>().Init(BoxType.Choice, color, spawnPos);
             choiceBoxList.Add(newBox.GetComponent<BoxBehaviour>());
         }
 
