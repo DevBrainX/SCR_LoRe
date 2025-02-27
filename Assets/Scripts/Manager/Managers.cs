@@ -8,11 +8,11 @@ public class Managers : MonoBehaviour
     public static Managers Instance { get { return _instance; } }
 
     [SerializeField] GameManager _Game;
-    //[SerializeField] UiManager _Ui;
+    [SerializeField] UiManager _Ui;
     [SerializeField] SceneManagerEx _Scene;
 
     public static GameManager Game { get { return Instance._Game; } }
-    //public static UiManager Ui { get { return Instance._Ui; } }
+    public static UiManager Ui { get { return Instance._Ui; } }
     public static SceneManagerEx Scene { get { return Instance._Scene; } }
 
     void Awake()

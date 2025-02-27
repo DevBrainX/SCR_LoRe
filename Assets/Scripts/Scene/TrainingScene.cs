@@ -2,34 +2,29 @@
 
 public class TrainingScene : BaseScene
 {
-    //[SerializeField] UiManager uiManager;
-    //[SerializeField] ObjectManager objectManager;
-    //[SerializeField] Player player;
-    //[SerializeField] RingGauge ringGauge;
-
-    //[SerializeField] BoxBehaviour answerBox;
     [SerializeField] Transform questionTrans;
     [SerializeField] Transform choiceTrans;
 
     void Start()
     {
+        index = 2;
+
         Init();
     }
 
     public override void Init()
     {
-        index = 2;
-
-        //Managers.Instance.SetUiManager(uiManager);
-        //Managers.Instance.SetObjectManager(objectManager);
-
-        //Managers.Game.answerBox = answerBox;
         Managers.Game.questionTrans = questionTrans;
         Managers.Game.choiceTrans = choiceTrans;
 
         //Managers.Game.Init();
 
-        Managers.Game.StartRound();
+        //Managers.Game.StartRound();
+
+        //Managers.Ui.trainingUi.SetActiveStartPage();
+
+        questionTrans.gameObject.SetActive(false);
+        choiceTrans.gameObject.SetActive(false);
     }
 
     void Update()

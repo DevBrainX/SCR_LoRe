@@ -9,68 +9,32 @@ public enum BoxType
     Answer, // 정답을 집어넣는 칸
 }
 
-public enum ObjectCategory
-{
-    Carnivore = 0,  // 동물-육식
-    Herbivore,      // 동물-초식
-    Fish,           // 해양-물고기
-    MarineMammal,    // 해양-포유류
-}
-
-
-
 public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     public SpriteRenderer image;
     public SpriteRenderer outline;
 
-    int spriteIndex;
-    int colorIndex;
-    int angleIndex;
-    int scaleIndex;
+    [HideInInspector] public BoxData data;
 
     BoxType type;
-
-    Color color;
 
     Vector3 oriLocalPos;
 
     float m_ZCoord;
 
-    BoxCollider2D boxCollider;
+    //BoxCollider2D boxCollider;
 
     // 더블클릭 체크용 변수
     public float doubleClickTime = 0.3f; // 더블 클릭으로 인식할 최대 시간
     private float lastClickTime = 0f;
 
-    void Start()
-    {
-        m_ZCoord = Camera.main.WorldToScreenPoint(transform.position).z;
-
-        boxCollider = GetComponent<BoxCollider2D>();
-
-        //if (type == BoxType.Choice)
-        //{
-        //    boxCollider.enabled = true;
-        //}
-        //else
-        //{
-        //    boxCollider.enabled = false;
-        //}
-
-        transform.localPosition = oriLocalPos;
-
-        image.color = color;
-    }
-
-    public void Init(BoxType _type, Color _color, Vector3 _oriLocalPos)
+    public void Init(BoxType _type, BoxData _data, Vector3 _oriLocalPos)
     {
         type = _type;
+        data = _data;
         oriLocalPos = _oriLocalPos;
-        color = _color;
 
-        image.transform.localScale = new Vector3(100f / 512f, 100f / 512f, 1f);
-
+        // 정답박스 일때는 테두리 on
         if (type == BoxType.Answer)
         {
             outline.gameObject.SetActive(true);
@@ -81,10 +45,51 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         }
     }
 
-    public void SetSprite(SpriteRenderer _image)
+    public void SetData(BoxData _data)
     {
-        image.sprite = _image.sprite;
-        image.color = _image.color;
+        data.SetData(_data);
+    }
+
+    void Start()
+    {
+        m_ZCoord = Camera.main.WorldToScreenPoint(transform.position).z;
+
+        //boxCollider = GetComponent<BoxCollider2D>();
+
+        SetOriginalPosition();
+
+        if (type != BoxType.Answer)
+        {
+            SetSprite();
+        }
+
+        SetColor();
+        SetScale();
+    }
+
+    public void SetSprite()
+    {
+        image.sprite = Managers.Game.imageList[data.categoryIndex].spriteList[data.spriteIndex];
+
+
+    }
+
+    public void SetColor()
+    {
+        switch (data.colorIndex)
+        {
+            case 0: image.color = Color.red; break;
+            case 1: image.color = Color.green; break;
+            case 2: image.color = Color.blue; break;
+            case 3: image.color = Color.yellow; break;
+            case 4: image.color = Color.gray; break;
+            default: image.color = Color.white; break;
+        }
+    }
+
+    public void SetScale()
+    {
+        image.transform.localScale = new Vector3(100f / 512f, 100f / 512f, 1f);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -96,7 +101,7 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
         // 마우스 화면 좌표를 월드 좌표로 변환
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
-        mouseWorldPos.z = m_ZCoord;
+        mouseWorldPos.z = transform.position.z;
 
         transform.position = mouseWorldPos;
     }
@@ -115,7 +120,7 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         BoxBehaviour answerBox = Managers.Game.answerBox;
 
         // 정답박스에 마우스 들어가있으면 정답박스에 고정, 아니면 원래 위치로
-        if (answerBox.GetComponent<BoxCollider2D>().OverlapPoint(mouseWorldPos))
+        if (GetComponent<BoxCollider2D>().OverlapPoint(answerBox.transform.position))
         {
             Managers.Game.InsertInAnswerBox(this);
         }

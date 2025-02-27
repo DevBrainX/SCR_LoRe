@@ -4,7 +4,7 @@ public class LobbySceneUi : MonoBehaviour
 {
     void Start()
     {
-
+        Managers.Ui.lobbyUi = this;
     }
 
     public void OnClickStartTutotial()

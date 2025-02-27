@@ -4,7 +4,7 @@ public class TutorialSceneUi : MonoBehaviour
 {
     void Start()
     {
-
+        Managers.Ui.tutorialUi = this;
     }
 
     public void OnClickBack()

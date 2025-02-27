@@ -4,12 +4,14 @@ public class TutorialScene : BaseScene
 {
     void Start()
     {
+        index = 1;
+
         Init();
     }
 
     public override void Init()
     {
-        index = 1;
+
     }
 
     void Update()

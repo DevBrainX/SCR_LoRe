@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public static class Utils
 {
@@ -7,6 +8,19 @@ public static class Utils
     //    int randomNumber = Random.Range(0, 2);
     //    return randomNumber == 1;
     //}
+
+    public static void ShuffleList<T>(List<T> list)
+    {
+        System.Random rng = new System.Random();
+        int n = list.Count;
+        while (n > 1)
+        {
+            int k = rng.Next(n--);
+            T temp = list[n];
+            list[n] = list[k];
+            list[k] = temp;
+        }
+    }
 
     public static void ClearList(GameObject listObject)
     {

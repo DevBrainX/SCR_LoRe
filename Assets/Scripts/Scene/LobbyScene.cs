@@ -4,12 +4,14 @@ public class LobbyScene : BaseScene
 {
     void Start()
     {
+        index = 0;
+
         Init();
     }
 
     public override void Init()
     {
-        index = 0;
+
     }
 
     void Update()

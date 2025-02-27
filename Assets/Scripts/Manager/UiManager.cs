@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class UiManager : MonoBehaviour
 {
+    public LobbySceneUi lobbyUi;
+    public TutorialSceneUi tutorialUi;
+    public TrainingSceneUi trainingUi;
+
     void Update()
     {
 
