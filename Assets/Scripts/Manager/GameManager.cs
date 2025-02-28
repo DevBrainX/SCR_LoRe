@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 
@@ -31,10 +32,10 @@ public class GameManager : MonoBehaviour
 {
     public List<SpriteList> imageList;
 
-    List<BoxData> boxDataList;
-
-
     [SerializeField] GameObject boxPrefab;
+
+    //List<BoxData> questionBoxDataList;
+    //List<BoxData> choiceBoxDataList;
 
     public BoxBehaviour answerBox;
     public Transform questionTrans;
@@ -44,16 +45,20 @@ public class GameManager : MonoBehaviour
     public List<BoxBehaviour> choiceBoxList;
 
     int currentChoiceIndex = -1;
+    int answerDataIndex = 0;
 
     Coroutine roundCoroutine = null;
 
 
     void Awake()
     {
+        //questionBoxDataList = new List<BoxData>();
+        //choiceBoxDataList = new List<BoxData>();
+
         questionBoxList = new List<BoxBehaviour>();
         choiceBoxList = new List<BoxBehaviour>();
 
-        boxDataList = new List<BoxData>();
+        //boxDataList = new List<BoxData>();
     }
 
     void Start()
@@ -90,7 +95,7 @@ public class GameManager : MonoBehaviour
         Utils.ClearList(questionTrans.gameObject);
         Utils.ClearList(choiceTrans.gameObject);
 
-        boxDataList.Clear();
+        //boxDataList.Clear();
 
         // 선택했던 인덱스 초기화
         currentChoiceIndex = -1;
@@ -107,6 +112,7 @@ public class GameManager : MonoBehaviour
 
 
         // 랜덤 인덱스를 저장할 BoxData
+        List<BoxData> boxDataList = new List<BoxData>();
         BoxData data;
 
         // 같은 내용인지?
@@ -121,8 +127,11 @@ public class GameManager : MonoBehaviour
                 int spriteIndex = Random.Range(0, imageList[categoryIndex].spriteList.Count);
 
                 data = new BoxData();
+                data.index = i;
                 data.categoryIndex = categoryIndex;
                 data.spriteIndex = spriteIndex;
+                // (임시) 칼라값 랜덤하게
+                data.colorIndex = GetRandomColorIndex();
 
                 isUnique = true;
 
@@ -142,22 +151,47 @@ public class GameManager : MonoBehaviour
             boxDataList.Add(data);
         }
 
-        // 문제 데이터 칼라 세팅
-        for (int i = 0; i < 7; ++i)
-        {
-            boxDataList[i].colorIndex = GetRandomColorIndex();
-
-            // (임시) 디버깅
-            //Debug.Log(boxDataList[i].categoryIndex + "," + boxDataList[i].spriteIndex);
-        }
+        //// (임시) 디버깅
+        //for (int i = 0; i < 7; ++i)
+        //{
+        //    Debug.Log(boxDataList[i].categoryIndex + "," + boxDataList[i].spriteIndex);
+        //}
 
 
         ///////////////////////////////////////////////////////////////
 
 
         // 정답 데이터 세팅
-        int answerDataIndex = 0;
-        boxDataList[answerDataIndex].isAnswer = true;
+        answerDataIndex = 0;
+        //boxDataList[answerDataIndex].isAnswer = true;
+
+        // 
+        List<BoxData> questionBoxDataList = new List<BoxData>();
+        List<BoxData> choiceBoxDataList = new List<BoxData>();
+
+        // question 개수 설정
+        int questionCount = 7;
+
+        // question 박스 데이터 리스트 세팅
+        for (int i = 0; i < questionCount; ++i)
+        {
+            data = new BoxData();
+
+            // AA 형태일때는 정답데이터 인덱스로 문제 만들기
+            data.SetData(boxDataList[answerDataIndex]);
+
+            // 마지막 인덱스는 정답박스로 만들기
+            if (i == (questionCount - 1))
+            {
+                data.type = BoxType.Answer;
+            }
+            else
+            {
+                data.type = BoxType.Question;
+            }
+
+            questionBoxDataList.Add(data);
+        }
 
 
         ///////////////////////////////////////////////////////////////
@@ -170,7 +204,7 @@ public class GameManager : MonoBehaviour
 
         // 문제 오브젝트 생성
         Vector3 spawnPos = Vector3.zero;
-        for (int i = 0; i < 7; ++i)
+        for (int i = 0; i < questionCount; ++i)
         {
             // 자식 스프라이트의 크기
             float childWidth = 100f / 100f; // (width 100 / screenRate 100)
@@ -178,17 +212,13 @@ public class GameManager : MonoBehaviour
             // 간격에 맞춰서 생성 위치 세팅
             spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 0);
 
+            // 문제박스 생성
             GameObject newBox = Instantiate(boxPrefab, questionTrans);
+            newBox.GetComponent<BoxBehaviour>().Init(questionBoxDataList[i], spawnPos);
 
-            if (i != 6)
+            // 정답박스 타입일때는 지정
+            if (newBox.GetComponent<BoxBehaviour>().data.type == BoxType.Answer)
             {
-                // 문제박스 생성
-                newBox.GetComponent<BoxBehaviour>().Init(BoxType.Question, boxDataList[answerDataIndex], spawnPos);
-            }
-            else
-            {
-                // 정답박스 생성
-                newBox.GetComponent<BoxBehaviour>().Init(BoxType.Answer, new BoxData(), spawnPos);
                 answerBox = newBox.GetComponent<BoxBehaviour>();
             }
 
@@ -202,19 +232,36 @@ public class GameManager : MonoBehaviour
         // choice 개수 설정
         int choiceCount = 7;
 
+        // choice 박스 데이터 리스트 세팅
+        for (int i = 0; i < choiceCount; ++i)
+        {
+            data = new BoxData();
+
+            // AA 형태일때는 정답데이터 인덱스로 문제 만들기
+            data.SetData(boxDataList[i]);
+
+            data.type = BoxType.Choice;
+
+            choiceBoxDataList.Add(data);
+        }
+
+        //// 선택지 인덱스를 랜덤하게 배치할 리스트
+        //List<int> randomChoiceIndexList = new List<int>();
+        //for (int i = 0; i < choiceCount; ++i)
+        //    randomChoiceIndexList.Add(i);
+
+        // choice 리스트 요소 셔플 (랜덤하게 섞음)
+        Utils.ShuffleList(choiceBoxDataList);
+
+
+        ///////////////////////////////////////////////////////////////
+
+
         // choice 영역 스프라이트 크기
         float choiceSpriteWidth = 9.2f;
 
         // choice 영역을 스크린 좌표계로 환산
         xOffset = 1 - (choiceSpriteWidth / 2);
-
-        // 선택지 인덱스를 랜덤하게 배치할 리스트
-        List<int> randomChoiceIndexList = new List<int>();
-        for (int i = 0; i < choiceCount; ++i)
-            randomChoiceIndexList.Add(i);
-
-        // 리스트 요소 셔플 (랜덤하게 섞음)
-        Utils.ShuffleList(randomChoiceIndexList);
 
         // choice 오브젝트 생성
         for (int i = 0; i < choiceCount; ++i)
@@ -223,11 +270,11 @@ public class GameManager : MonoBehaviour
             float childWidth = 100f / 100f; // (width 100 / screenRate 100)
 
             // 간격에 맞춰서 생성 위치 세팅
-            spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, -0.1f); // z값 -1로
+            spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 0);
 
             // choice 박스 생성 (랜덤하게 섞어놓은 인덱스대로 배치)
             GameObject newBox = Instantiate(boxPrefab, choiceTrans);
-            newBox.GetComponent<BoxBehaviour>().Init(BoxType.Choice, boxDataList[randomChoiceIndexList[i]], spawnPos);
+            newBox.GetComponent<BoxBehaviour>().Init(choiceBoxDataList[i], spawnPos);
             choiceBoxList.Add(newBox.GetComponent<BoxBehaviour>());
         }
 
@@ -261,7 +308,13 @@ public class GameManager : MonoBehaviour
         currentChoiceIndex = choiceBoxList.IndexOf(_box);
         choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
 
-        answerBox.SetData(_box.data);
+        //answerBox.SetData(_box.data);
+        answerBox.data.categoryIndex = _box.data.categoryIndex;
+        answerBox.data.spriteIndex = _box.data.spriteIndex;
+        answerBox.data.colorIndex = _box.data.colorIndex;
+        answerBox.data.angle = _box.data.angle;
+        answerBox.data.scale = _box.data.scale;
+
         answerBox.SetSprite();
         answerBox.SetColor();
     }
@@ -275,7 +328,13 @@ public class GameManager : MonoBehaviour
 
             currentChoiceIndex = -1;
 
-            answerBox.SetData(new BoxData());
+            //answerBox.SetData(new BoxData());
+            answerBox.data.categoryIndex = -1;
+            answerBox.data.spriteIndex = -1;
+            answerBox.data.colorIndex = -1;
+            answerBox.data.angle = 0;
+            answerBox.data.scale = 0;
+
             answerBox.image.sprite = null;
             answerBox.image.color = Color.white;
         }
@@ -289,7 +348,8 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (choiceBoxList[currentChoiceIndex].data.isAnswer == true)
+        //if (choiceBoxList[currentChoiceIndex].data.isAnswer == true)
+        if (choiceBoxList[currentChoiceIndex].data.index == answerDataIndex)
         {
             Managers.Ui.trainingUi.SetCheckText("Correct");
             answerBox.SetOutlineColor(Color.green);

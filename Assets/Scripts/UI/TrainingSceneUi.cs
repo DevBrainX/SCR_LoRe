@@ -69,7 +69,14 @@ public class TrainingSceneUi : MonoBehaviour
 
     public void SetCheckText(string _text)
     {
-        checkText.text = _text;
-        //checkText.color = Color.white;
+        if(_text == string.Empty)
+        {
+            checkText.gameObject.SetActive(false);
+        }
+        else
+        {
+            checkText.gameObject.SetActive(true);
+            checkText.text = _text;
+        }
     }
 }

@@ -1,37 +1,33 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static UnityEditor.LightingExplorerTableColumn;
 using Color = UnityEngine.Color;
 
-public enum BoxType
-{
-    Question, // 문제 (이동 불가능)
-    Choice, // 선택지 (정답, 오답 둘 다 가능)
-    Answer, // 정답을 집어넣는 칸
-}
 
-public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
+public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public SpriteRenderer image;
     public SpriteRenderer outline;
 
     [HideInInspector] public BoxData data;
 
-    BoxType type;
-
     Vector3 oriLocalPos;
+
+    // 드래그 이동 관련 변수
+    private Vector3 initialPosition;
+    private Vector3 dragStartPosition;
 
     // 더블클릭 체크용 변수
     public float doubleClickTime = 0.3f; // 더블 클릭으로 인식할 최대 시간
     private float lastClickTime = 0f;
 
-    public void Init(BoxType _type, BoxData _data, Vector3 _oriLocalPos)
+    public void Init(BoxData _data, Vector3 _oriLocalPos)
     {
-        type = _type;
         data = _data;
         oriLocalPos = _oriLocalPos;
 
         // 정답박스 일때는 테두리 on
-        if (type == BoxType.Answer)
+        if (data.type == BoxType.Answer)
         {
             outline.gameObject.SetActive(true);
             SetOutlineColor(Color.gray);
@@ -51,7 +47,7 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         SetOriginalPosition();
 
-        if (type != BoxType.Answer)
+        if (data.type != BoxType.Answer)
         {
             SetSprite();
         }
@@ -88,9 +84,43 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         outline.color = _color;
     }
 
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (data.type != BoxType.Choice)
+        {
+            return;
+        }
+
+        // 드래그 시작 시 오브젝트의 현재 위치를 저장
+        initialPosition = transform.position;
+
+        // 마우스 시작 위치 저장
+        dragStartPosition = Camera.main.ScreenToWorldPoint(eventData.position);
+        dragStartPosition.z = initialPosition.z; // Z축을 현재 오브젝트의 Z축으로 설정
+    }
+
     public void OnDrag(PointerEventData eventData)
     {
-        if (type != BoxType.Choice)
+        if (data.type != BoxType.Choice)
+        {
+            return;
+        }
+
+        // 현재 마우스 위치 계산 (마우스 화면 좌표를 월드 좌표로 변환)
+        Vector3 currentMousePosition = Camera.main.ScreenToWorldPoint(eventData.position);
+        currentMousePosition.z = initialPosition.z;
+
+        // 드래그 이동량 계산
+        Vector3 delta = currentMousePosition - dragStartPosition;
+        delta.z -= 0.1f;
+
+        // 오브젝트 위치 업데이트
+        transform.position = initialPosition + delta;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (data.type != BoxType.Choice)
         {
             return;
         }
@@ -99,24 +129,10 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
         mouseWorldPos.z = transform.position.z;
 
-        transform.position = mouseWorldPos;
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (type != BoxType.Choice)
-        {
-            return;
-        }
-
-        // 마우스 화면 좌표를 월드 좌표로 변환
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
-        mouseWorldPos.z = transform.position.z;  //0; // 2D 게임에서는 z 축을 0으로 설정
-
         BoxBehaviour answerBox = Managers.Game.answerBox;
 
         // 정답박스에 마우스 들어가있으면 정답박스에 고정, 아니면 원래 위치로
-        if (GetComponent<BoxCollider2D>().OverlapPoint(answerBox.transform.position))
+        if (answerBox.GetComponent<BoxCollider2D>().OverlapPoint(mouseWorldPos))
         {
             Managers.Game.InsertInAnswerBox(this);
         }
@@ -141,11 +157,11 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void OnDoubleClick()
     {
-        if (type == BoxType.Answer)
+        if (data.type == BoxType.Answer)
         {
             Managers.Game.RemoveInAnswerBox();
         }
-        else if (type == BoxType.Choice)
+        else if (data.type == BoxType.Choice)
         {
             Managers.Game.InsertInAnswerBox(this);
         }
