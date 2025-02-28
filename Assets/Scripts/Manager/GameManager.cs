@@ -292,10 +292,12 @@ public class GameManager : MonoBehaviour
         if (choiceBoxList[currentChoiceIndex].data.isAnswer == true)
         {
             Managers.Ui.trainingUi.SetCheckText("Correct");
+            answerBox.SetOutlineColor(Color.green);
         }
         else
         {
             Managers.Ui.trainingUi.SetCheckText("Wrong");
+            answerBox.SetOutlineColor(Color.red);
         }
 
         Managers.Ui.trainingUi.SetActiveButton(1);

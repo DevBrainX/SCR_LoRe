@@ -20,10 +20,6 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
     Vector3 oriLocalPos;
 
-    float m_ZCoord;
-
-    //BoxCollider2D boxCollider;
-
     // 더블클릭 체크용 변수
     public float doubleClickTime = 0.3f; // 더블 클릭으로 인식할 최대 시간
     private float lastClickTime = 0f;
@@ -38,6 +34,7 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
         if (type == BoxType.Answer)
         {
             outline.gameObject.SetActive(true);
+            SetOutlineColor(Color.gray);
         }
         else
         {
@@ -52,10 +49,6 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
     void Start()
     {
-        m_ZCoord = Camera.main.WorldToScreenPoint(transform.position).z;
-
-        //boxCollider = GetComponent<BoxCollider2D>();
-
         SetOriginalPosition();
 
         if (type != BoxType.Answer)
@@ -70,8 +63,6 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
     public void SetSprite()
     {
         image.sprite = Managers.Game.imageList[data.categoryIndex].spriteList[data.spriteIndex];
-
-
     }
 
     public void SetColor()
@@ -90,6 +81,11 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
     public void SetScale()
     {
         image.transform.localScale = new Vector3(100f / 512f, 100f / 512f, 1f);
+    }
+
+    public void SetOutlineColor(Color _color)
+    {
+        outline.color = _color;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -115,7 +111,7 @@ public class BoxBehaviour : MonoBehaviour, IDragHandler, IEndDragHandler
 
         // 마우스 화면 좌표를 월드 좌표로 변환
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(eventData.position);
-        mouseWorldPos.z = 0; // 2D 게임에서는 z 축을 0으로 설정
+        mouseWorldPos.z = transform.position.z;  //0; // 2D 게임에서는 z 축을 0으로 설정
 
         BoxBehaviour answerBox = Managers.Game.answerBox;
 
