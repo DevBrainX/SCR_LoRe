@@ -8,8 +8,11 @@ using Random = UnityEngine.Random;
 
 public enum QuestionType
 {
+    None = -1,
     AAAA = 0,
     ABAB,
+    AAB,
+    AABB,
     MAX
 }
 
@@ -37,6 +40,9 @@ public class GameManager : MonoBehaviour
     //List<BoxData> questionBoxDataList;
     //List<BoxData> choiceBoxDataList;
 
+    public GameObject startPage;
+    public GameObject roundPage;
+
     public BoxBehaviour answerBox;
     public Transform questionTrans;
     public Transform choiceTrans;
@@ -45,6 +51,18 @@ public class GameManager : MonoBehaviour
     public List<BoxBehaviour> choiceBoxList;
 
     int currentChoiceIndex = -1;
+
+    public int currentRound = 1;
+    public int currentQuestionCount = 0;
+    public int totalQuestionCount = 0;
+    public int correctCount = 0;
+    public int wrongCount = 0;
+    float nextRoundPercentage = 0.7f;
+
+    // 현재 문제의 타입 (AA,AB 등등)
+    QuestionType currentQuestionType = QuestionType.None;
+
+    List<int> questionDataIndex;
     int answerDataIndex = 0;
 
     Coroutine roundCoroutine = null;
@@ -66,18 +84,10 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void StartRound()
-    {
-        InitRound();
-
-        // 라운드 코루틴 시작
-        roundCoroutine = StartCoroutine(RoundLoop());
-
-        Debug.Log("StartRound()");
-    }
-
     public void InitRound()
     {
+        roundPage.SetActive(true);
+
         // 문제박스, 선택지박스 부모 오브젝트 on
         questionTrans.gameObject.SetActive(true);
         choiceTrans.gameObject.SetActive(true);
@@ -89,39 +99,49 @@ public class GameManager : MonoBehaviour
             roundCoroutine = null;
         }
 
+        //// 라운드 카운트 변수 세팅
+        //currentRound++;
+        currentQuestionCount = 0;
+        totalQuestionCount = 10; // (임시)
+        correctCount = 0;
+        wrongCount = 0;
+    }
+
+    public void StartRound()
+    {
         // 문제박스, 선택지박스 리스트 초기화
         questionBoxList.Clear();
         choiceBoxList.Clear();
         Utils.ClearList(questionTrans.gameObject);
         Utils.ClearList(choiceTrans.gameObject);
 
-        //boxDataList.Clear();
-
         // 선택했던 인덱스 초기화
         currentChoiceIndex = -1;
 
         // UI 초기화
+        Managers.Ui.trainingUi.SetProgressText();
         Managers.Ui.trainingUi.SetCheckText(string.Empty);
-
         Managers.Ui.trainingUi.SetActiveButton(0);
+
+        // 라운드 코루틴 시작
+        roundCoroutine = StartCoroutine(RoundLoop());
+
+        Debug.Log("StartRound()");
     }
 
     public IEnumerator RoundLoop()
     {
-        // UI off
-
-
         // 랜덤 인덱스를 저장할 BoxData
         List<BoxData> boxDataList = new List<BoxData>();
-        BoxData data;
-
-        // 같은 내용인지?
-        bool isUnique;
+        BoxData data = null;
 
         for (int i = 0; i < 7; ++i)
         {
+            // 중복되지 않는 인덱스가 있는지?
+            bool isUnique = false;
+
             // 중복되지 않는 인덱스를 찾을 때까지 반복
-            do
+            while (!isUnique)
             {
                 int categoryIndex = Random.Range(0, imageList.Count);
                 int spriteIndex = Random.Range(0, imageList[categoryIndex].spriteList.Count);
@@ -144,8 +164,7 @@ public class GameManager : MonoBehaviour
                         break;
                     }
                 }
-
-            } while (!isUnique); // 중복되지 않을 때까지 반복
+            }
 
             // 중복이 아닌 경우 리스트에 추가
             boxDataList.Add(data);
@@ -160,10 +179,44 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
+        // 현재 문제의 타입 세팅 (AA,AB 등등)
+        if (currentQuestionType == QuestionType.None)
+            currentQuestionType = QuestionType.AAAA;
+        else if (currentQuestionType == QuestionType.AAAA)
+            currentQuestionType = QuestionType.ABAB;
+        else if (currentQuestionType == QuestionType.ABAB)
+            currentQuestionType = QuestionType.AABB;
+        else if (currentQuestionType == QuestionType.AABB)
+            currentQuestionType = QuestionType.AAB;
+        else
+            currentQuestionType = QuestionType.AAAA;
 
-        // 정답 데이터 세팅
-        answerDataIndex = 0;
-        //boxDataList[answerDataIndex].isAnswer = true;
+        // 문제 타입에 따른 questionDataIndex, answerDataIndex 세팅
+        if (currentQuestionType == QuestionType.AAAA)
+        {
+            // 문제, 정답 데이터 세팅
+            questionDataIndex = new List<int> { 0 };
+            answerDataIndex = 0;
+        }
+        else if (currentQuestionType == QuestionType.ABAB)
+        {
+            // 문제, 정답 데이터 세팅
+            questionDataIndex = new List<int> { 0, 1 };
+            answerDataIndex = 0;
+        }
+        else if (currentQuestionType == QuestionType.AABB)
+        {
+            // 문제, 정답 데이터 세팅
+            questionDataIndex = new List<int> { 0, 0, 1, 1 };
+            answerDataIndex = 1;
+        }
+        else if (currentQuestionType == QuestionType.AAB)
+        {
+            // 문제, 정답 데이터 세팅
+            questionDataIndex = new List<int> { 0, 0, 1 };
+            answerDataIndex = 0;
+        }
+
 
         // 
         List<BoxData> questionBoxDataList = new List<BoxData>();
@@ -178,7 +231,7 @@ public class GameManager : MonoBehaviour
             data = new BoxData();
 
             // AA 형태일때는 정답데이터 인덱스로 문제 만들기
-            data.SetData(boxDataList[answerDataIndex]);
+            data.SetData(boxDataList[questionDataIndex[(i % questionDataIndex.Count)]]);
 
             // 마지막 인덱스는 정답박스로 만들기
             if (i == (questionCount - 1))
@@ -335,8 +388,8 @@ public class GameManager : MonoBehaviour
             answerBox.data.angle = 0;
             answerBox.data.scale = 0;
 
-            answerBox.image.sprite = null;
-            answerBox.image.color = Color.white;
+            answerBox.SetSprite();
+            answerBox.SetColor();
         }
     }
 
@@ -348,19 +401,37 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        //if (choiceBoxList[currentChoiceIndex].data.isAnswer == true)
         if (choiceBoxList[currentChoiceIndex].data.index == answerDataIndex)
         {
             Managers.Ui.trainingUi.SetCheckText("Correct");
             answerBox.SetOutlineColor(Color.green);
+            correctCount++;
         }
         else
         {
             Managers.Ui.trainingUi.SetCheckText("Wrong");
             answerBox.SetOutlineColor(Color.red);
+            wrongCount++;
+        }
+
+        currentQuestionCount++;
+
+        // 문제 횟수 다 채웠으면 다음 라운드로
+        if (currentQuestionCount >= totalQuestionCount)
+        {
+            float currentRoundPercentage = (float)correctCount / (float)totalQuestionCount;
+
+            if (currentRoundPercentage >= nextRoundPercentage)
+            {
+                currentRound++;
+            }
+
+            roundPage.SetActive(false);
+            Managers.Ui.trainingUi.SetActiveStartPage();
         }
 
         Managers.Ui.trainingUi.SetActiveButton(1);
+        Managers.Ui.trainingUi.SetProgressText();
 
     }
 

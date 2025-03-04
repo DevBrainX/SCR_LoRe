@@ -6,11 +6,14 @@ public class TrainingSceneUi : MonoBehaviour
     [SerializeField] GameObject startPage;
     [SerializeField] GameObject roundPage;
 
+    [SerializeField] TextMeshProUGUI roundText;
+
     [SerializeField] GameObject checkButton;
     [SerializeField] GameObject nextButton;
     [SerializeField] GameObject backButton;
 
     [SerializeField] TextMeshProUGUI checkText;
+    [SerializeField] TextMeshProUGUI progressText;
 
     void Start()
     {
@@ -37,6 +40,8 @@ public class TrainingSceneUi : MonoBehaviour
     {
         startPage.SetActive(true);
         roundPage.SetActive(false);
+
+        SetRoundText();
     }
 
     public void SetActiveRoundPage()
@@ -49,6 +54,7 @@ public class TrainingSceneUi : MonoBehaviour
     {
         SetActiveRoundPage();
 
+        Managers.Game.InitRound();
         Managers.Game.StartRound();
     }
 
@@ -67,6 +73,11 @@ public class TrainingSceneUi : MonoBehaviour
         Managers.Scene.LoadScene(0);
     }
 
+    public void SetRoundText()
+    {
+        roundText.text = string.Format("Round {0}", Managers.Game.currentRound);
+    }
+
     public void SetCheckText(string _text)
     {
         if(_text == string.Empty)
@@ -78,5 +89,11 @@ public class TrainingSceneUi : MonoBehaviour
             checkText.gameObject.SetActive(true);
             checkText.text = _text;
         }
+    }
+
+    public void SetProgressText()
+    {
+        progressText.text = string.Format("Total: {0}\nCorrect: {1}\nWrong: {2}", 
+            Managers.Game.totalQuestionCount, Managers.Game.correctCount, Managers.Game.wrongCount);
     }
 }

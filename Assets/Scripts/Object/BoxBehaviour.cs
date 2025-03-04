@@ -58,7 +58,14 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void SetSprite()
     {
-        image.sprite = Managers.Game.imageList[data.categoryIndex].spriteList[data.spriteIndex];
+        if (data.categoryIndex == -1 || data.spriteIndex == -1)
+        {
+            image.sprite = null;
+        }
+        else
+        {
+            image.sprite = Managers.Game.imageList[data.categoryIndex].spriteList[data.spriteIndex];
+        }
     }
 
     public void SetColor()
@@ -70,7 +77,7 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             case 2: image.color = Color.blue; break;
             case 3: image.color = Color.yellow; break;
             case 4: image.color = Color.gray; break;
-            default: image.color = Color.white; break;
+            default: image.color = Color.white; break; // -1
         }
     }
 
