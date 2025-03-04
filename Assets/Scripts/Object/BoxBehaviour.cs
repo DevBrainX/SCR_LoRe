@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static UnityEditor.LightingExplorerTableColumn;
 using Color = UnityEngine.Color;
 
 

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 
@@ -57,7 +56,6 @@ public class GameManager : MonoBehaviour
     public int totalQuestionCount = 0;
     public int correctCount = 0;
     public int wrongCount = 0;
-    float nextRoundPercentage = 0.7f;
 
     // 현재 문제의 타입 (AA,AB 등등)
     QuestionType currentQuestionType = QuestionType.None;
@@ -105,6 +103,8 @@ public class GameManager : MonoBehaviour
         totalQuestionCount = 10; // (임시)
         correctCount = 0;
         wrongCount = 0;
+
+        currentQuestionType = QuestionType.None;
     }
 
     public void StartRound()
@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour
         // UI 초기화
         Managers.Ui.trainingUi.SetProgressText();
         Managers.Ui.trainingUi.SetCheckText(string.Empty);
-        Managers.Ui.trainingUi.SetActiveButton(0);
+        Managers.Ui.trainingUi.SetActiveNextButton(false);
 
         // 라운드 코루틴 시작
         roundCoroutine = StartCoroutine(RoundLoop());
@@ -179,17 +179,52 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
+
         // 현재 문제의 타입 세팅 (AA,AB 등등)
-        if (currentQuestionType == QuestionType.None)
-            currentQuestionType = QuestionType.AAAA;
-        else if (currentQuestionType == QuestionType.AAAA)
-            currentQuestionType = QuestionType.ABAB;
-        else if (currentQuestionType == QuestionType.ABAB)
-            currentQuestionType = QuestionType.AABB;
-        else if (currentQuestionType == QuestionType.AABB)
-            currentQuestionType = QuestionType.AAB;
+        if (currentRound == 1)
+        {
+            // 첫 라운드는 무조건 
+            if (currentQuestionType == QuestionType.None)
+            {
+                currentQuestionType = QuestionType.AAAA;
+            }
+            else
+            {
+                int randomQuestionType = Random.Range(0, 2);
+                currentQuestionType = (QuestionType)randomQuestionType;
+            }
+        }
+        else if(currentRound == 2)
+        {
+            // 첫 라운드는 무조건 
+            if (currentQuestionType == QuestionType.None)
+            {
+                currentQuestionType = QuestionType.AAAA;
+            }
+            else
+            {
+                int randomQuestionType = Random.Range(0, 3);
+                currentQuestionType = (QuestionType)randomQuestionType;
+            }
+        }
         else
-            currentQuestionType = QuestionType.AAAA;
+        {
+            // 첫 라운드는 무조건 
+            if (currentQuestionType == QuestionType.None)
+            {
+                currentQuestionType = QuestionType.AAAA;
+            }
+            else
+            {
+                int randomQuestionType = Random.Range(0, 4);
+                currentQuestionType = (QuestionType)randomQuestionType;
+            }
+        }
+
+        // (임시)
+        Debug.Log(currentQuestionType);
+
+
 
         // 문제 타입에 따른 questionDataIndex, answerDataIndex 세팅
         if (currentQuestionType == QuestionType.AAAA)
@@ -297,11 +332,6 @@ public class GameManager : MonoBehaviour
 
             choiceBoxDataList.Add(data);
         }
-
-        //// 선택지 인덱스를 랜덤하게 배치할 리스트
-        //List<int> randomChoiceIndexList = new List<int>();
-        //for (int i = 0; i < choiceCount; ++i)
-        //    randomChoiceIndexList.Add(i);
 
         // choice 리스트 요소 셔플 (랜덤하게 섞음)
         Utils.ShuffleList(choiceBoxDataList);
@@ -421,18 +451,39 @@ public class GameManager : MonoBehaviour
         {
             float currentRoundPercentage = (float)correctCount / (float)totalQuestionCount;
 
+            float nextRoundPercentage = 0.7f;
+            float prevRoundPercentage = 0.5f;
+            int nextRoundCheck = 0;
+
             if (currentRoundPercentage >= nextRoundPercentage)
             {
                 currentRound++;
+                nextRoundCheck = 2; // Next
+            }
+            else if (currentRoundPercentage >= prevRoundPercentage)
+            {
+                nextRoundCheck = 1; // Stay
+            }
+            else
+            {
+                if(currentRound > 1)
+                {
+                    currentRound--;
+                    nextRoundCheck = 0; // Prev
+                }
+                else
+                {
+                    nextRoundCheck = 1; // Stay
+                }
             }
 
             roundPage.SetActive(false);
-            Managers.Ui.trainingUi.SetActiveStartPage();
+            Managers.Ui.trainingUi.SetPage(2);
+            Managers.Ui.trainingUi.SetFinishText(nextRoundCheck);
         }
 
-        Managers.Ui.trainingUi.SetActiveButton(1);
+        Managers.Ui.trainingUi.SetActiveNextButton(true);
         Managers.Ui.trainingUi.SetProgressText();
-
     }
 
     void Update()

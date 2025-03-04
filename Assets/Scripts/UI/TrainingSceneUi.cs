@@ -3,11 +3,14 @@ using UnityEngine;
 
 public class TrainingSceneUi : MonoBehaviour
 {
+    //
     [SerializeField] GameObject startPage;
     [SerializeField] GameObject roundPage;
+    [SerializeField] GameObject finishPage;
 
     [SerializeField] TextMeshProUGUI roundText;
-
+    
+    //
     [SerializeField] GameObject checkButton;
     [SerializeField] GameObject nextButton;
     [SerializeField] GameObject backButton;
@@ -15,44 +18,57 @@ public class TrainingSceneUi : MonoBehaviour
     [SerializeField] TextMeshProUGUI checkText;
     [SerializeField] TextMeshProUGUI progressText;
 
+    //
+    [SerializeField] TextMeshProUGUI finishText;
+
     void Start()
     {
         Managers.Ui.trainingUi = this;
 
-        SetActiveStartPage();
+        SetPage(0);
     }
 
-    public void SetActiveButton(int _state)
+    public void SetPage(int _page)
     {
-        if (_state == 0) // 처음 시작한 상태
+        if (_page == 0) // startPage
+        {
+            startPage.SetActive(true);
+            roundPage.SetActive(false);
+            finishPage.SetActive(false);
+
+            SetRoundText();
+        }
+        else if (_page == 1) // roundPage
+        {
+            startPage.SetActive(false);
+            roundPage.SetActive(true);
+            finishPage.SetActive(false);
+        }
+        else if (_page == 2) // finishPage
+        {
+            startPage.SetActive(false);
+            roundPage.SetActive(false);
+            finishPage.SetActive(true);
+        }
+    }
+
+    public void SetActiveNextButton(bool _hasCheckAnswer)
+    {
+        if (_hasCheckAnswer == false) // 정답 체크 안한 상태
         {
             checkButton.SetActive(true);
             nextButton.SetActive(false);
         }
-        else // 정답을 체크한 상태
+        else // 정답 체크한 상태
         {
             checkButton.SetActive(false);
             nextButton.SetActive(true);
         }
     }
 
-    public void SetActiveStartPage()
-    {
-        startPage.SetActive(true);
-        roundPage.SetActive(false);
-
-        SetRoundText();
-    }
-
-    public void SetActiveRoundPage()
-    {
-        startPage.SetActive(false);
-        roundPage.SetActive(true);
-    }
-
     public void OnClickStart()
     {
-        SetActiveRoundPage();
+        SetPage(1);
 
         Managers.Game.InitRound();
         Managers.Game.StartRound();
@@ -63,7 +79,7 @@ public class TrainingSceneUi : MonoBehaviour
         Managers.Game.CheckAnswer();
     }
 
-    public void OnClickNext()
+    public void OnClickNextQuestion()
     {
         Managers.Game.StartRound();
     }
@@ -71,6 +87,11 @@ public class TrainingSceneUi : MonoBehaviour
     public void OnClickBack()
     {
         Managers.Scene.LoadScene(0);
+    }
+
+    public void OnClickNextRound()
+    {
+        SetPage(0);
     }
 
     public void SetRoundText()
@@ -95,5 +116,21 @@ public class TrainingSceneUi : MonoBehaviour
     {
         progressText.text = string.Format("Total: {0}\nCorrect: {1}\nWrong: {2}", 
             Managers.Game.totalQuestionCount, Managers.Game.correctCount, Managers.Game.wrongCount);
+    }
+
+    public void SetFinishText(int _state)
+    {
+        if (_state == 0)
+        {
+            finishText.text = string.Format("좀 더 노력하세요.\n이전 라운드로 계속 진행합니다.");
+        }
+        else if(_state == 1)
+        {
+            finishText.text = string.Format("좀 더 노력하세요.\n현재 라운드로 계속 진행합니다.");
+        }
+        else if (_state == 2)
+        {
+            finishText.text = string.Format("잘 하셨습니다.\n다음 라운드로 계속 진행합니다.");
+        }
     }
 }

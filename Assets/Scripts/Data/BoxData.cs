@@ -28,7 +28,6 @@ public class BoxData
     public int colorIndex;
     public float angle;
     public float scale;
-    //public bool isAnswer;
 
     public BoxData()
     {
@@ -39,7 +38,6 @@ public class BoxData
         colorIndex = -1;
         angle = 0f;
         scale = 0f;
-        //isAnswer = false;
     }
 
     public void SetData(BoxData _data)
@@ -51,6 +49,5 @@ public class BoxData
         colorIndex = _data.colorIndex;
         angle = _data.angle;
         scale = _data.scale;
-        //isAnswer = _data.isAnswer;
     }
 }
