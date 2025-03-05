@@ -5,16 +5,6 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 
-public enum QuestionType
-{
-    None = -1,
-    AAAA = 0,
-    ABAB,
-    AAB,
-    AABB,
-    MAX
-}
-
 public enum ObjectCategory
 {
     Carnivore = 0,  // 동물-육식
@@ -23,21 +13,15 @@ public enum ObjectCategory
     MarineMammal,    // 해양-포유류
 }
 
-[Serializable] //반드시 필요
-public class SpriteList //행에 해당되는 이름
-{
-    public List<Sprite> spriteList;
-}
-
-
 public class GameManager : MonoBehaviour
 {
-    public List<SpriteList> imageList;
-
     [SerializeField] GameObject boxPrefab;
 
     //List<BoxData> questionBoxDataList;
     //List<BoxData> choiceBoxDataList;
+
+    //List<BoxData> boxDataList;
+    List<BoxData> prevBoxDataList;
 
     public GameObject startPage;
     public GameObject roundPage;
@@ -52,13 +36,10 @@ public class GameManager : MonoBehaviour
     int currentChoiceIndex = -1;
 
     public int currentRound = 1;
-    public int currentQuestionCount = 0;
-    public int totalQuestionCount = 0;
-    public int correctCount = 0;
-    public int wrongCount = 0;
-
-    // 현재 문제의 타입 (AA,AB 등등)
-    QuestionType currentQuestionType = QuestionType.None;
+    public int currentQuestionCount;
+    public int totalQuestionCount;
+    public int correctCount;
+    public int wrongCount;
 
     List<int> questionDataIndex;
     int answerDataIndex = 0;
@@ -75,6 +56,7 @@ public class GameManager : MonoBehaviour
         choiceBoxList = new List<BoxBehaviour>();
 
         //boxDataList = new List<BoxData>();
+        prevBoxDataList = new List<BoxData>();
     }
 
     void Start()
@@ -100,11 +82,9 @@ public class GameManager : MonoBehaviour
         //// 라운드 카운트 변수 세팅
         //currentRound++;
         currentQuestionCount = 0;
-        totalQuestionCount = 10; // (임시)
+        totalQuestionCount = 5; // (임시)
         correctCount = 0;
         wrongCount = 0;
-
-        currentQuestionType = QuestionType.None;
     }
 
     public void StartRound()
@@ -131,6 +111,74 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator RoundLoop()
     {
+        // 현재 라운드에 출제되는 문제의 유형 정보
+        QuestionData currentQuestionData = null;
+
+        // 현재 문제의 타입 세팅 (AA,AB 등등)
+        if (currentRound == 1)
+        {
+            // 현재 라운드에 출제되는 문제의 유형을 담아놓는 리스트 (랜덤하게 뽑기 위함)
+            List<QuestionData> randomQuestionDataList = new List<QuestionData>()
+            {
+                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_1x7, QuestionCategory.Shape, QuestionSpriteType.Realistic),
+                new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Shape, QuestionSpriteType.Realistic),
+                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_3x3, QuestionCategory.Shape, QuestionSpriteType.Realistic),
+                new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Shape, QuestionSpriteType.Realistic),
+            };
+
+            if (currentQuestionCount == 0)
+            {
+                // 첫 라운드는 무조건 0번 인덱스
+                currentQuestionData = randomQuestionDataList[0];
+            }
+            else
+            {
+                // 이후 랜덤하게 인덱스 세팅
+                int randomQuestionDataIndex = Random.Range(0, randomQuestionDataList.Count);
+                currentQuestionData = randomQuestionDataList[randomQuestionDataIndex];
+            }
+        }
+        //else if(currentRound == 2)
+        //{
+        //    // 첫 라운드는 무조건 
+        //    if (currentQuestionCount == 0)
+        //    {
+        //        currentQuestionType = QuestionType.AAAA;
+        //    }
+        //    else
+        //    {
+        //        int randomQuestionType = Random.Range(0, 3);
+        //        currentQuestionType = (QuestionType)randomQuestionType;
+        //    }
+        //}
+        else
+        {
+            List<QuestionData> randomQuestionDataList = new List<QuestionData>()
+            {
+                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                new QuestionData(QuestionPattern.AABB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                new QuestionData(QuestionPattern.AABB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
+            };
+
+            if (currentQuestionCount == 0)
+            {
+                currentQuestionData = randomQuestionDataList[0];
+            }
+            else
+            {
+                int randomQuestionDataIndex = Random.Range(0, randomQuestionDataList.Count);
+                currentQuestionData = randomQuestionDataList[randomQuestionDataIndex];
+            }
+        }
+
+        // (임시)
+        Debug.Log(currentQuestionData.ToString());
+
+        ///////////////////////////////////////////////////////////////
+
         // 랜덤 인덱스를 저장할 BoxData
         List<BoxData> boxDataList = new List<BoxData>();
         BoxData data = null;
@@ -143,25 +191,49 @@ public class GameManager : MonoBehaviour
             // 중복되지 않는 인덱스를 찾을 때까지 반복
             while (!isUnique)
             {
-                int categoryIndex = Random.Range(0, imageList.Count);
-                int spriteIndex = Random.Range(0, imageList[categoryIndex].spriteList.Count);
-
                 data = new BoxData();
                 data.index = i;
-                data.categoryIndex = categoryIndex;
-                data.spriteIndex = spriteIndex;
-                // (임시) 칼라값 랜덤하게
-                data.colorIndex = GetRandomColorIndex();
+
+                // 사실적 이미지 일때는 흰색, 추상적 이미지 일때는 랜덤
+                if (currentQuestionData.spriteType == QuestionSpriteType.Realistic)
+                {
+                    data.spriteType = QuestionSpriteType.Realistic;
+                    data.spriteCategoryIndex = Random.Range(0, Managers.Resource.realSpriteList.Count);
+                    data.spriteIndex = Random.Range(0, Managers.Resource.realSpriteList[data.spriteCategoryIndex].Count);
+                    data.colorIndex = -1;
+                }
+                else
+                {
+                    data.spriteType = QuestionSpriteType.Abstract;
+                    data.spriteCategoryIndex = Random.Range(0, Managers.Resource.abstSpriteList.Count);
+                    data.spriteIndex = Random.Range(0, Managers.Resource.abstSpriteList[data.spriteCategoryIndex].Count);
+                    data.colorIndex = Random.Range(0, (int)ColorIndex.MAX);
+                }
 
                 isUnique = true;
 
-                // 기존 리스트와 비교하여 중복 여부 확인
-                foreach (var data2 in boxDataList)
+                // 이전 박스 리스트에 있는 요소인지 중복 여부 확인
+                foreach (var data2 in prevBoxDataList)
                 {
                     if (IsEqualIndex(data, data2))
                     {
+                        // 중복된것 발견하면 break하고 다시 while문 처음으로 돌아감
                         isUnique = false;
                         break;
+                    }
+                }
+
+                // 현재 박스 리스트에 있는 요소인지 중복 여부 확인
+                if (isUnique)
+                {
+                    foreach (var data2 in boxDataList)
+                    {
+                        if (IsEqualIndex(data, data2))
+                        {
+                            // 중복된것 발견하면 break하고 다시 while문 처음으로 돌아감
+                            isUnique = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -176,82 +248,36 @@ public class GameManager : MonoBehaviour
         //    Debug.Log(boxDataList[i].categoryIndex + "," + boxDataList[i].spriteIndex);
         //}
 
+        // 이전 박스 데이터 옮겨담기 (중복 방지)
+        prevBoxDataList.Clear();
+        prevBoxDataList.AddRange(boxDataList);
 
         ///////////////////////////////////////////////////////////////
 
-
-        // 현재 문제의 타입 세팅 (AA,AB 등등)
-        if (currentRound == 1)
-        {
-            // 첫 라운드는 무조건 
-            if (currentQuestionType == QuestionType.None)
-            {
-                currentQuestionType = QuestionType.AAAA;
-            }
-            else
-            {
-                int randomQuestionType = Random.Range(0, 2);
-                currentQuestionType = (QuestionType)randomQuestionType;
-            }
-        }
-        else if(currentRound == 2)
-        {
-            // 첫 라운드는 무조건 
-            if (currentQuestionType == QuestionType.None)
-            {
-                currentQuestionType = QuestionType.AAAA;
-            }
-            else
-            {
-                int randomQuestionType = Random.Range(0, 3);
-                currentQuestionType = (QuestionType)randomQuestionType;
-            }
-        }
-        else
-        {
-            // 첫 라운드는 무조건 
-            if (currentQuestionType == QuestionType.None)
-            {
-                currentQuestionType = QuestionType.AAAA;
-            }
-            else
-            {
-                int randomQuestionType = Random.Range(0, 4);
-                currentQuestionType = (QuestionType)randomQuestionType;
-            }
-        }
-
-        // (임시)
-        Debug.Log(currentQuestionType);
-
-
-
         // 문제 타입에 따른 questionDataIndex, answerDataIndex 세팅
-        if (currentQuestionType == QuestionType.AAAA)
+        switch (currentQuestionData.pattern)
         {
             // 문제, 정답 데이터 세팅
-            questionDataIndex = new List<int> { 0 };
-            answerDataIndex = 0;
-        }
-        else if (currentQuestionType == QuestionType.ABAB)
-        {
-            // 문제, 정답 데이터 세팅
-            questionDataIndex = new List<int> { 0, 1 };
-            answerDataIndex = 0;
-        }
-        else if (currentQuestionType == QuestionType.AABB)
-        {
-            // 문제, 정답 데이터 세팅
-            questionDataIndex = new List<int> { 0, 0, 1, 1 };
-            answerDataIndex = 1;
-        }
-        else if (currentQuestionType == QuestionType.AAB)
-        {
-            // 문제, 정답 데이터 세팅
-            questionDataIndex = new List<int> { 0, 0, 1 };
-            answerDataIndex = 0;
-        }
+            case QuestionPattern.AAAA:
+                questionDataIndex = new List<int> { 0 };
+                answerDataIndex = 0;
+                break;
 
+            case QuestionPattern.ABAB:
+                questionDataIndex = new List<int> { 0, 1 };
+                answerDataIndex = 0;
+                break;
+
+            case QuestionPattern.AABB:
+                questionDataIndex = new List<int> { 0, 0, 1, 1 };
+                answerDataIndex = 1;
+                break;
+
+            case QuestionPattern.AAB:
+                questionDataIndex = new List<int> { 0, 0, 1 };
+                answerDataIndex = 0;
+                break;
+        }
 
         // 
         List<BoxData> questionBoxDataList = new List<BoxData>();
@@ -265,7 +291,7 @@ public class GameManager : MonoBehaviour
         {
             data = new BoxData();
 
-            // AA 형태일때는 정답데이터 인덱스로 문제 만들기
+            // 문제 데이터 패턴에 따른 문제 인덱스 세팅
             data.SetData(boxDataList[questionDataIndex[(i % questionDataIndex.Count)]]);
 
             // 마지막 인덱스는 정답박스로 만들기
@@ -366,7 +392,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsEqualIndex(BoxData _sour, BoxData _dest)
     {
-        if (_sour.categoryIndex == _dest.categoryIndex
+        if (_sour.spriteCategoryIndex == _dest.spriteCategoryIndex
             && _sour.spriteIndex == _dest.spriteIndex)
         {
             return true;
@@ -392,7 +418,8 @@ public class GameManager : MonoBehaviour
         choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
 
         //answerBox.SetData(_box.data);
-        answerBox.data.categoryIndex = _box.data.categoryIndex;
+        answerBox.data.spriteType = _box.data.spriteType;
+        answerBox.data.spriteCategoryIndex = _box.data.spriteCategoryIndex;
         answerBox.data.spriteIndex = _box.data.spriteIndex;
         answerBox.data.colorIndex = _box.data.colorIndex;
         answerBox.data.angle = _box.data.angle;
@@ -412,7 +439,7 @@ public class GameManager : MonoBehaviour
             currentChoiceIndex = -1;
 
             //answerBox.SetData(new BoxData());
-            answerBox.data.categoryIndex = -1;
+            answerBox.data.spriteCategoryIndex = -1;
             answerBox.data.spriteIndex = -1;
             answerBox.data.colorIndex = -1;
             answerBox.data.angle = 0;
@@ -451,8 +478,8 @@ public class GameManager : MonoBehaviour
         {
             float currentRoundPercentage = (float)correctCount / (float)totalQuestionCount;
 
-            float nextRoundPercentage = 0.7f;
-            float prevRoundPercentage = 0.5f;
+            float nextRoundPercentage = 0.5f;
+            float prevRoundPercentage = 0.2f;
             int nextRoundCheck = 0;
 
             if (currentRoundPercentage >= nextRoundPercentage)
@@ -466,7 +493,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                if(currentRound > 1)
+                if (currentRound > 1)
                 {
                     currentRound--;
                     nextRoundCheck = 0; // Prev

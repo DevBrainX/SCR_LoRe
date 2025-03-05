@@ -57,13 +57,20 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void SetSprite()
     {
-        if (data.categoryIndex == -1 || data.spriteIndex == -1)
+        if (data.spriteCategoryIndex == -1 || data.spriteIndex == -1)
         {
             image.sprite = null;
         }
         else
         {
-            image.sprite = Managers.Game.imageList[data.categoryIndex].spriteList[data.spriteIndex];
+            if (data.spriteType == QuestionSpriteType.Realistic)
+            {
+                image.sprite = Managers.Resource.realSpriteList[data.spriteCategoryIndex][data.spriteIndex];
+            }
+            else if (data.spriteType == QuestionSpriteType.Abstract)
+            {
+                image.sprite = Managers.Resource.abstSpriteList[data.spriteCategoryIndex][data.spriteIndex];
+            }
         }
     }
 

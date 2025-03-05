@@ -23,7 +23,8 @@ public class BoxData
 {
     public int index;
     public BoxType type;
-    public int categoryIndex;
+    public QuestionSpriteType spriteType;
+    public int spriteCategoryIndex;
     public int spriteIndex;
     public int colorIndex;
     public float angle;
@@ -33,7 +34,8 @@ public class BoxData
     {
         index = -1;
         type = BoxType.None;
-        categoryIndex = -1;
+        spriteType = QuestionSpriteType.None;
+        spriteCategoryIndex = -1;
         spriteIndex = -1;
         colorIndex = -1;
         angle = 0f;
@@ -44,7 +46,8 @@ public class BoxData
     {
         index = _data.index;
         type = _data.type;
-        categoryIndex = _data.categoryIndex;
+        spriteType = _data.spriteType;
+        spriteCategoryIndex = _data.spriteCategoryIndex;
         spriteIndex = _data.spriteIndex;
         colorIndex = _data.colorIndex;
         angle = _data.angle;
