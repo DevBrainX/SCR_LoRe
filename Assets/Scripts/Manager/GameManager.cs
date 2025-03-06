@@ -2,33 +2,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 
-public enum ObjectCategory
-{
-    Carnivore = 0,  // 동물-육식
-    Herbivore,      // 동물-초식
-    Fish,           // 해양-물고기
-    MarineMammal,    // 해양-포유류
-}
+//public enum ObjectCategory
+//{
+//    Carnivore = 0,  // 동물-육식
+//    Herbivore,      // 동물-초식
+//    Fish,           // 해양-물고기
+//    MarineMammal,    // 해양-포유류
+//}
 
 public class GameManager : MonoBehaviour
 {
+    public TrainingScene trainingScene;
+
     [SerializeField] GameObject boxPrefab;
+
+    public GameObject startPage;
+    public GameObject roundPage;
+
+    public GameObject questionField;
+    public GameObject choiceField;
+
+    public BoxBehaviour answerBox;
 
     //List<BoxData> questionBoxDataList;
     //List<BoxData> choiceBoxDataList;
 
     //List<BoxData> boxDataList;
     List<BoxData> prevBoxDataList;
-
-    public GameObject startPage;
-    public GameObject roundPage;
-
-    public BoxBehaviour answerBox;
-    public Transform questionTrans;
-    public Transform choiceTrans;
 
     public List<BoxBehaviour> questionBoxList;
     public List<BoxBehaviour> choiceBoxList;
@@ -69,8 +73,8 @@ public class GameManager : MonoBehaviour
         roundPage.SetActive(true);
 
         // 문제박스, 선택지박스 부모 오브젝트 on
-        questionTrans.gameObject.SetActive(true);
-        choiceTrans.gameObject.SetActive(true);
+        questionField.SetActive(true);
+        choiceField.SetActive(true);
 
         // 코루틴 멈추기
         if (roundCoroutine != null)
@@ -92,8 +96,8 @@ public class GameManager : MonoBehaviour
         // 문제박스, 선택지박스 리스트 초기화
         questionBoxList.Clear();
         choiceBoxList.Clear();
-        Utils.ClearList(questionTrans.gameObject);
-        Utils.ClearList(choiceTrans.gameObject);
+        Utils.ClearChild(questionField);
+        Utils.ClearChild(choiceField);
 
         // 선택했던 인덱스 초기화
         currentChoiceIndex = -1;
@@ -103,8 +107,16 @@ public class GameManager : MonoBehaviour
         Managers.Ui.trainingUi.SetCheckText(string.Empty);
         Managers.Ui.trainingUi.SetActiveNextButton(false);
 
-        // 라운드 코루틴 시작
-        roundCoroutine = StartCoroutine(RoundLoop());
+        // 문제 횟수 다 채웠으면 Finish 페이지 로드
+        if (currentQuestionCount >= totalQuestionCount)
+        {
+            GoFinishPage();
+        }
+        else
+        {
+            // 라운드 코루틴 시작
+            roundCoroutine = StartCoroutine(RoundLoop());
+        }
 
         Debug.Log("StartRound()");
     }
@@ -122,7 +134,7 @@ public class GameManager : MonoBehaviour
             {
                 new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_1x7, QuestionCategory.Shape, QuestionSpriteType.Realistic),
                 new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Shape, QuestionSpriteType.Realistic),
-                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_3x3, QuestionCategory.Shape, QuestionSpriteType.Realistic),
+                new QuestionData(QuestionPattern.ABC, QuestionMatrixType.Matrix_3x3, QuestionCategory.Shape, QuestionSpriteType.Realistic),
                 new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Shape, QuestionSpriteType.Realistic),
             };
 
@@ -158,9 +170,9 @@ public class GameManager : MonoBehaviour
                 new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
                 new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
                 new QuestionData(QuestionPattern.AABB, QuestionMatrixType.Matrix_1x7, QuestionCategory.Color, QuestionSpriteType.Abstract),
-                new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                //new QuestionData(QuestionPattern.AAAA, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
                 new QuestionData(QuestionPattern.ABAB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
-                new QuestionData(QuestionPattern.AABB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
+                //new QuestionData(QuestionPattern.AABB, QuestionMatrixType.Matrix_3x3, QuestionCategory.Color, QuestionSpriteType.Abstract),
             };
 
             if (currentQuestionCount == 0)
@@ -194,12 +206,12 @@ public class GameManager : MonoBehaviour
                 data = new BoxData();
                 data.index = i;
 
-                // 사실적 이미지 일때는 흰색, 추상적 이미지 일때는 랜덤
                 if (currentQuestionData.spriteType == QuestionSpriteType.Realistic)
                 {
                     data.spriteType = QuestionSpriteType.Realistic;
                     data.spriteCategoryIndex = Random.Range(0, Managers.Resource.realSpriteList.Count);
                     data.spriteIndex = Random.Range(0, Managers.Resource.realSpriteList[data.spriteCategoryIndex].Count);
+                    // 사실적 이미지 일때는 흰색, 추상적 이미지 일때는 랜덤
                     data.colorIndex = -1;
                 }
                 else
@@ -254,37 +266,68 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
+        // 정답 위치 인덱스
+        int answerIndex = 0;
+
         // 문제 타입에 따른 questionDataIndex, answerDataIndex 세팅
         switch (currentQuestionData.pattern)
         {
             // 문제, 정답 데이터 세팅
-            case QuestionPattern.AAAA:
-                questionDataIndex = new List<int> { 0 };
-                answerDataIndex = 0;
+            case QuestionPattern.AAAA: // 1x7
+                questionDataIndex = new List<int> { 0, 0, 0, 0, 0, 0, 0 };
+                answerIndex = 6;
                 break;
 
-            case QuestionPattern.ABAB:
-                questionDataIndex = new List<int> { 0, 1 };
-                answerDataIndex = 0;
+            case QuestionPattern.ABAB: // 1x7, 3x3
+                if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_1x7)
+                {
+                    questionDataIndex = new List<int> { 0, 1, 0, 1, 0, 1, 0 };
+                    answerIndex = 6;
+                }
+                else if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_3x3)
+                {
+                    questionDataIndex = new List<int> { 0, 1, 0, 1, 0, 1, 0, 1, 0 };
+
+                    if (Utils.GetRandomBool())
+                        answerIndex = 3;
+                    else
+                        answerIndex = 5;
+                }
                 break;
 
-            case QuestionPattern.AABB:
-                questionDataIndex = new List<int> { 0, 0, 1, 1 };
-                answerDataIndex = 1;
+            case QuestionPattern.AABB: // 1x7
+                questionDataIndex = new List<int> { 0, 0, 1, 1, 0, 0, 1 };
+                answerIndex = 6;
                 break;
 
-            case QuestionPattern.AAB:
-                questionDataIndex = new List<int> { 0, 0, 1 };
-                answerDataIndex = 0;
+            case QuestionPattern.ABC: // 3x3
+                questionDataIndex = new List<int> { 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+
+                if (Utils.GetRandomBool())
+                    answerIndex = 1;
+                else
+                    answerIndex = 7;
                 break;
+
+                //case QuestionPattern.AAB:
+                //    questionDataIndex = new List<int> { 0, 0, 1 };
+                //    answerDataIndex = 0;
+                //    break;
         }
+
+        // 정답 데이터의 인덱스는 정답 List 인덱스 번호
+        answerDataIndex = questionDataIndex[answerIndex];
 
         // 
         List<BoxData> questionBoxDataList = new List<BoxData>();
         List<BoxData> choiceBoxDataList = new List<BoxData>();
 
         // question 개수 설정
-        int questionCount = 7;
+        int questionCount = 0;
+        if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_1x7)
+            questionCount = 7;
+        else if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_3x3)
+            questionCount = 9;
 
         // question 박스 데이터 리스트 세팅
         for (int i = 0; i < questionCount; ++i)
@@ -292,10 +335,10 @@ public class GameManager : MonoBehaviour
             data = new BoxData();
 
             // 문제 데이터 패턴에 따른 문제 인덱스 세팅
-            data.SetData(boxDataList[questionDataIndex[(i % questionDataIndex.Count)]]);
+            data.SetData(boxDataList[questionDataIndex[i]]);
 
-            // 마지막 인덱스는 정답박스로 만들기
-            if (i == (questionCount - 1))
+            // 정답 위치 인덱스인지 확인
+            if (i == answerIndex)
             {
                 data.type = BoxType.Answer;
             }
@@ -310,11 +353,19 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
+        // question 영역 스프라이트 세팅
+        trainingScene.SetQuestionFieldSprite(currentQuestionData.matrixType);
+
         // question 영역 스프라이트 크기
-        float questionSpriteWidth = 9.2f;
+        float questionSpriteWidth = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        float questionSpriteHeight = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
 
         // question 영역을 스크린 좌표계로 환산
         float xOffset = 1 - (questionSpriteWidth / 2);
+        float yOffset = 1 - (questionSpriteHeight / 2);
+
+        // 박스간의 간격
+        float spacing = 0.2f;
 
         // 문제 오브젝트 생성
         Vector3 spawnPos = Vector3.zero;
@@ -323,11 +374,26 @@ public class GameManager : MonoBehaviour
             // 자식 스프라이트의 크기
             float childWidth = 100f / 100f; // (width 100 / screenRate 100)
 
-            // 간격에 맞춰서 생성 위치 세팅
-            spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 0);
+            // 1x7 행렬일때 배치 세팅
+            if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_1x7)
+            {
+                // 간격에 맞춰서 생성 위치 세팅
+                spawnPos = new Vector3(xOffset + ((childWidth + spacing) * i), yOffset, 0);
+            }
+            // 3x3 행렬일때 배치 세팅
+            else if (currentQuestionData.matrixType == QuestionMatrixType.Matrix_3x3)
+            {
+                // 행과 열 계산
+                int columns = 3;
+                int row = i / columns; // 현재 행
+                int col = i % columns; // 현재 열
+
+                // 간격에 맞춰서 생성 위치 세팅
+                spawnPos = new Vector3(xOffset + (childWidth + spacing) * col, yOffset + (childWidth + spacing) * row, 0);
+            }
 
             // 문제박스 생성
-            GameObject newBox = Instantiate(boxPrefab, questionTrans);
+            GameObject newBox = Instantiate(boxPrefab, questionField.transform);
             newBox.GetComponent<BoxBehaviour>().Init(questionBoxDataList[i], spawnPos);
 
             // 정답박스 타입일때는 지정
@@ -382,7 +448,7 @@ public class GameManager : MonoBehaviour
             spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 0);
 
             // choice 박스 생성 (랜덤하게 섞어놓은 인덱스대로 배치)
-            GameObject newBox = Instantiate(boxPrefab, choiceTrans);
+            GameObject newBox = Instantiate(boxPrefab, choiceField.transform);
             newBox.GetComponent<BoxBehaviour>().Init(choiceBoxDataList[i], spawnPos);
             choiceBoxList.Add(newBox.GetComponent<BoxBehaviour>());
         }
@@ -473,44 +539,43 @@ public class GameManager : MonoBehaviour
 
         currentQuestionCount++;
 
-        // 문제 횟수 다 채웠으면 다음 라운드로
-        if (currentQuestionCount >= totalQuestionCount)
+        Managers.Ui.trainingUi.SetActiveNextButton(true);
+        Managers.Ui.trainingUi.SetProgressText();
+    }
+
+    void GoFinishPage()
+    {
+        float currentRoundPercentage = (float)correctCount / (float)totalQuestionCount;
+
+        float nextRoundPercentage = 0.5f;
+        float prevRoundPercentage = 0.2f;
+        int nextRoundCheck = 0;
+
+        if (currentRoundPercentage >= nextRoundPercentage)
         {
-            float currentRoundPercentage = (float)correctCount / (float)totalQuestionCount;
-
-            float nextRoundPercentage = 0.5f;
-            float prevRoundPercentage = 0.2f;
-            int nextRoundCheck = 0;
-
-            if (currentRoundPercentage >= nextRoundPercentage)
+            currentRound++;
+            nextRoundCheck = 2; // Next
+        }
+        else if (currentRoundPercentage >= prevRoundPercentage)
+        {
+            nextRoundCheck = 1; // Stay
+        }
+        else
+        {
+            if (currentRound > 1)
             {
-                currentRound++;
-                nextRoundCheck = 2; // Next
-            }
-            else if (currentRoundPercentage >= prevRoundPercentage)
-            {
-                nextRoundCheck = 1; // Stay
+                currentRound--;
+                nextRoundCheck = 0; // Prev
             }
             else
             {
-                if (currentRound > 1)
-                {
-                    currentRound--;
-                    nextRoundCheck = 0; // Prev
-                }
-                else
-                {
-                    nextRoundCheck = 1; // Stay
-                }
+                nextRoundCheck = 1; // Stay
             }
-
-            roundPage.SetActive(false);
-            Managers.Ui.trainingUi.SetPage(2);
-            Managers.Ui.trainingUi.SetFinishText(nextRoundCheck);
         }
 
-        Managers.Ui.trainingUi.SetActiveNextButton(true);
-        Managers.Ui.trainingUi.SetProgressText();
+        roundPage.SetActive(false);
+        Managers.Ui.trainingUi.SetPage(2);
+        Managers.Ui.trainingUi.SetFinishText(nextRoundCheck);
     }
 
     void Update()

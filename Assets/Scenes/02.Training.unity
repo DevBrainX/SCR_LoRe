@@ -2016,7 +2016,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 400}
+  m_AnchoredPosition: {x: -700, y: 450}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1442683301
@@ -2066,8 +2066,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 70
-  m_fontSizeBase: 70
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2144,7 +2144,7 @@ Transform:
   m_GameObject: {fileID: 1519040136}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.5, z: 0}
+  m_LocalPosition: {x: 0, y: -2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2518,8 +2518,10 @@ MonoBehaviour:
   index: 0
   startPage: {fileID: 1827068165}
   roundPage: {fileID: 2091536812}
-  questionTrans: {fileID: 569918686}
-  choiceTrans: {fileID: 1519040137}
+  questionField: {fileID: 569918685}
+  choiceField: {fileID: 1519040136}
+  back_1x7: {fileID: 21300000, guid: c9f613f0d5296cd44aa4f531c913a00e, type: 3}
+  back_3x3: {fileID: 21300000, guid: b2ba9fdcb6bf9d5429c01c2920414503, type: 3}
 --- !u!1 &1725552984
 GameObject:
   m_ObjectHideFlags: 0

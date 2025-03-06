@@ -5,8 +5,11 @@ public class TrainingScene : BaseScene
     [SerializeField] GameObject startPage;
     [SerializeField] GameObject roundPage;
 
-    [SerializeField] Transform questionTrans;
-    [SerializeField] Transform choiceTrans;
+    [SerializeField] GameObject questionField;
+    [SerializeField] GameObject choiceField;
+
+    [SerializeField] Sprite back_1x7;
+    [SerializeField] Sprite back_3x3;
 
     void Start()
     {
@@ -17,15 +20,25 @@ public class TrainingScene : BaseScene
 
     public override void Init()
     {
+        Managers.Game.trainingScene = this;
+
         startPage.SetActive(false);
         roundPage.SetActive(false);
         Managers.Game.startPage = startPage;
         Managers.Game.roundPage = roundPage;
 
-        questionTrans.gameObject.SetActive(false);
-        choiceTrans.gameObject.SetActive(false);
-        Managers.Game.questionTrans = questionTrans;
-        Managers.Game.choiceTrans = choiceTrans;
+        questionField.SetActive(false);
+        choiceField.SetActive(false);
+        Managers.Game.questionField = questionField;
+        Managers.Game.choiceField = choiceField;
+    }
+
+    public void SetQuestionFieldSprite(QuestionMatrixType _matrixType)
+    {
+        if (_matrixType == QuestionMatrixType.Matrix_1x7)
+            questionField.GetComponent<SpriteRenderer>().sprite = back_1x7;
+        else if (_matrixType == QuestionMatrixType.Matrix_3x3)
+            questionField.GetComponent<SpriteRenderer>().sprite = back_3x3;
     }
 
     //public void SetActiveStartPage()

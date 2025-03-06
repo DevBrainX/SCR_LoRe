@@ -6,6 +6,7 @@ public enum QuestionPattern
     AAAA = 0,
     ABAB,
     AABB,
+    ABC,
     AAB,
 }
 
