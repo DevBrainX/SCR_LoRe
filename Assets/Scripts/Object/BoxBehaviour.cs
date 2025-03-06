@@ -37,39 +37,39 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
     }
 
-    public void SetData(BoxData _data)
-    {
-        data.SetData(_data);
-    }
-
     void Start()
     {
         SetOriginalPosition();
 
         if (data.type != BoxType.Answer)
         {
-            SetSprite();
+            SetImageProperties();
         }
+    }
 
+    public void SetImageProperties()
+    {
+        SetSprite();
         SetColor();
+        SetRotation();
         SetScale();
     }
 
     public void SetSprite()
     {
-        if (data.spriteCategoryIndex == -1 || data.spriteIndex == -1)
+        if (data.spriteData.category == -1 || data.spriteData.index == -1)
         {
             image.sprite = null;
         }
         else
         {
-            if (data.spriteType == QuestionSpriteType.Realistic)
+            if (data.spriteData.type == QuestionSpriteType.Realistic)
             {
-                image.sprite = Managers.Resource.realSpriteList[data.spriteCategoryIndex][data.spriteIndex];
+                image.sprite = Managers.Resource.realSpriteList[data.spriteData.category][data.spriteData.index];
             }
-            else if (data.spriteType == QuestionSpriteType.Abstract)
+            else if (data.spriteData.type == QuestionSpriteType.Abstract)
             {
-                image.sprite = Managers.Resource.abstSpriteList[data.spriteCategoryIndex][data.spriteIndex];
+                image.sprite = Managers.Resource.abstSpriteList[data.spriteData.category][data.spriteData.index];
             }
         }
     }
@@ -78,18 +78,30 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     {
         switch (data.colorIndex)
         {
-            case 0: image.color = Color.red; break;
-            case 1: image.color = Color.green; break;
-            case 2: image.color = Color.blue; break;
-            case 3: image.color = Color.yellow; break;
-            case 4: image.color = Color.gray; break;
+            case (int)ColorIndex.Red:
+                image.color = new Color(255f / 255f, 99f / 255f, 71f / 255f);
+                break;
+            case (int)ColorIndex.Blue:
+                image.color = new Color(30f / 255f, 144f / 255f, 255f / 255f);
+                break;
+            case (int)ColorIndex.Yellow:
+                image.color = new Color(255f / 255f, 215f / 255f, 0f / 255f);
+                break;
+            case (int)ColorIndex.Green:
+                image.color = new Color(50f / 255f, 205f / 255f, 50f / 255f);
+                break;
             default: image.color = Color.white; break; // -1
         }
     }
 
+    public void SetRotation()
+    {
+        image.transform.localRotation = Quaternion.Euler(0, data.angle, 0);
+    }
+
     public void SetScale()
     {
-        image.transform.localScale = new Vector3(100f / 512f, 100f / 512f, 1f);
+        image.transform.localScale = new Vector3(100f / 512f * data.scale, 100f / 512f * data.scale, 1f);
     }
 
     public void SetOutlineColor(Color _color)
@@ -184,6 +196,11 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     {
         transform.localPosition = oriLocalPos;
     }
+
+    //public void SetData(BoxData _data)
+    //{
+    //    data.SetData(_data);
+    //}
 
     void Update()
     {

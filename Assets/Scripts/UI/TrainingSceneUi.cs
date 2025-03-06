@@ -9,7 +9,7 @@ public class TrainingSceneUi : MonoBehaviour
     [SerializeField] GameObject finishPage;
 
     [SerializeField] TextMeshProUGUI roundText;
-    
+
     //
     [SerializeField] GameObject checkButton;
     [SerializeField] GameObject nextButton;
@@ -101,7 +101,7 @@ public class TrainingSceneUi : MonoBehaviour
 
     public void SetCheckText(string _text)
     {
-        if(_text == string.Empty)
+        if (_text == string.Empty)
         {
             checkText.gameObject.SetActive(false);
         }
@@ -114,7 +114,7 @@ public class TrainingSceneUi : MonoBehaviour
 
     public void SetProgressText()
     {
-        progressText.text = string.Format("Total: {0}\nCorrect: {1}\nWrong: {2}", 
+        progressText.text = string.Format("Total: {0}\nCorrect: {1}\nWrong: {2}",
             Managers.Game.totalQuestionCount, Managers.Game.correctCount, Managers.Game.wrongCount);
     }
 
@@ -124,7 +124,7 @@ public class TrainingSceneUi : MonoBehaviour
         {
             finishText.text = string.Format("좀 더 노력하세요.\n이전 라운드로 계속 진행합니다.");
         }
-        else if(_state == 1)
+        else if (_state == 1)
         {
             finishText.text = string.Format("좀 더 노력하세요.\n현재 라운드로 계속 진행합니다.");
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using static UnityEditor.U2D.ScriptablePacker;
 
 public enum BoxType
 {
@@ -12,20 +13,34 @@ public enum ColorIndex
 {
     White = -1,
     Red = 0,
-    Green,
     Blue,
     Yellow,
-    Gray,
+    Green,
     MAX
+}
+
+public class SpriteData
+{
+    public QuestionSpriteType type;
+    public int category;
+    public int index;
+
+    public SpriteData()
+    {
+        type = QuestionSpriteType.None;
+        category = -1;
+        index = -1;
+    }
 }
 
 public class BoxData
 {
     public int index;
     public BoxType type;
-    public QuestionSpriteType spriteType;
-    public int spriteCategoryIndex;
-    public int spriteIndex;
+    public SpriteData spriteData;
+    //public QuestionSpriteType spriteType;
+    //public int spriteCategoryIndex;
+    //public int spriteIndex;
     public int colorIndex;
     public float angle;
     public float scale;
@@ -34,23 +49,39 @@ public class BoxData
     {
         index = -1;
         type = BoxType.None;
-        spriteType = QuestionSpriteType.None;
-        spriteCategoryIndex = -1;
-        spriteIndex = -1;
-        colorIndex = -1;
+        spriteData = new SpriteData();
+        //spriteType = QuestionSpriteType.None;
+        //spriteCategoryIndex = -1;
+        //spriteIndex = -1;
+        colorIndex = (int)ColorIndex.White;
         angle = 0f;
-        scale = 0f;
+        scale = 1f;
     }
 
-    public void SetData(BoxData _data)
+    public BoxData(int _index, BoxType _type, SpriteData _spriteData,
+        int _colorIndex = -1, float _angle = 0f, float _scale = 1f)
     {
-        index = _data.index;
-        type = _data.type;
-        spriteType = _data.spriteType;
-        spriteCategoryIndex = _data.spriteCategoryIndex;
-        spriteIndex = _data.spriteIndex;
-        colorIndex = _data.colorIndex;
-        angle = _data.angle;
-        scale = _data.scale;
+        index = _index;
+        type = _type;
+        spriteData = _spriteData;
+        //spriteType = _spriteType;
+        //spriteCategoryIndex = _spriteCategoryIndex;
+        //spriteIndex = _spriteIndex;
+        colorIndex = _colorIndex;
+        angle = _angle;
+        scale = _scale;
     }
+
+    //public void SetData(BoxData _data)
+    //{
+    //    index = _data.index;
+    //    type = _data.type;
+    //    spriteData = _data.spriteData;
+    //    //spriteType = _data.spriteType;
+    //    //spriteCategoryIndex = _data.spriteCategoryIndex;
+    //    //spriteIndex = _data.spriteIndex;
+    //    colorIndex = _data.colorIndex;
+    //    angle = _data.angle;
+    //    scale = _data.scale;
+    //}
 }

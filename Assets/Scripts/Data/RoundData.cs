@@ -1,0 +1,677 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
+
+public class RoundData
+{
+    public List<BoxData> questionBoxDataList = null;
+    public List<BoxData> choiceBoxDataList = null;
+
+    public int answerDataIndex = -1;
+
+    public QuestionData questionData = null;
+
+    public List<SpriteData> spriteDataList = null;
+
+    // 현재 라운드에 출제되는 문제의 유형을 담아놓는 리스트 (랜덤하게 뽑기 위함)
+    public List<QuestionData> randomQuestionDataList = null;
+
+    public virtual void Init()
+    {
+
+    }
+
+    public bool IsEqualIndex(SpriteData _sour, SpriteData _dest)
+    {
+        if (_sour.category == _dest.category && _sour.index == _dest.index)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // spriteDataList 에 랜덤하게 스프라이트 데이터를 생성해서 저장해놓음
+    public void SetRandomSpriteDataList(QuestionSpriteType _type, int _count)
+    {
+        // 데이터 컨테이너 초기화
+        spriteDataList = new List<SpriteData>();
+        spriteDataList.Clear();
+
+        // 랜덤 인덱스를 저장할 BoxData
+        SpriteData data = null;
+
+        for (int i = 0; i < _count; ++i)
+        {
+            // 중복되지 않는 인덱스가 있는지?
+            bool isUnique = false;
+
+            // 중복되지 않는 인덱스를 찾을 때까지 반복
+            while (!isUnique)
+            {
+                data = new SpriteData();
+
+                if (_type == QuestionSpriteType.Realistic)
+                {
+                    data.type = QuestionSpriteType.Realistic;
+                    data.category = Random.Range(0, Managers.Resource.realSpriteList.Count);
+                    data.index = Random.Range(0, Managers.Resource.realSpriteList[data.category].Count);
+                }
+                else
+                {
+                    data.type = QuestionSpriteType.Abstract;
+                    data.category = Random.Range(0, Managers.Resource.abstSpriteList.Count);
+                    data.index = Random.Range(0, Managers.Resource.abstSpriteList[data.category].Count);
+                }
+
+                isUnique = true;
+
+                // 이전 박스 리스트에 있는 요소인지 중복 여부 확인
+                foreach (var data2 in Managers.Game.prevSpriteDataList)
+                {
+                    if (IsEqualIndex(data, data2))
+                    {
+                        // 중복된것 발견하면 break하고 다시 while문 처음으로 돌아감
+                        isUnique = false;
+                        break;
+                    }
+                }
+
+                // 현재 박스 리스트에 있는 요소인지 중복 여부 확인
+                if (isUnique)
+                {
+                    foreach (var data2 in spriteDataList)
+                    {
+                        if (IsEqualIndex(data, data2))
+                        {
+                            // 중복된것 발견하면 break하고 다시 while문 처음으로 돌아감
+                            isUnique = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 중복이 아닌 경우 리스트에 추가
+            spriteDataList.Add(data);
+        }
+
+        //// (임시) 디버깅
+        //for (int i = 0; i < spriteDataList.count; ++i)
+        //{
+        //    Debug.Log(spriteDataList[i].category + "," + spriteDataList[i].index);
+        //}
+
+        // 이전 박스 데이터 옮겨담기 (중복 방지)
+        Managers.Game.prevSpriteDataList.Clear();
+        Managers.Game.prevSpriteDataList.AddRange(spriteDataList);
+    }
+
+    public int GetRandomColorIndex(int _prevIndex = -1)
+    {
+        int randomIndex = Random.Range(0, (int)ColorIndex.MAX);
+
+        // randomIndex가 _prevIndex와 같을 경우 반복
+        while (_prevIndex >= 0 && randomIndex == _prevIndex)
+        {
+            randomIndex = Random.Range(0, (int)ColorIndex.MAX);
+        }
+
+        return randomIndex;
+    }
+
+    public void SetRoundData()
+    {
+        if (Managers.Game.currentQuestionCount == 0)
+        {
+            // 첫 라운드는 무조건 0번 인덱스
+            questionData = randomQuestionDataList[0];
+        }
+        else
+        {
+            // 이후 랜덤하게 인덱스 세팅
+            int randomQuestionDataIndex = Random.Range(0, randomQuestionDataList.Count);
+            questionData = randomQuestionDataList[randomQuestionDataIndex];
+        }
+
+        // 문제데이터에 사용될 스프라이트 인덱스 랜덤하게 세팅
+        SetRandomSpriteDataList(questionData.spriteType, 7);
+
+        // 정답의 색상
+        int answerColor = GetRandomColorIndex();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // 문제 데이터 리스트, 선택지 데이터 리스트 세팅
+
+        // AAAA Matrix_1x7 Shape Realistic
+        if (questionData.pattern == QuestionPattern.AAAA && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
+                };
+
+            answerDataIndex = 0;
+        }
+        // ABAB Matrix_1x7 Shape Realistic
+        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(1, BoxType.Question, spriteDataList[1]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(1, BoxType.Question, spriteDataList[1]),
+                    new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    new BoxData(1, BoxType.Question, spriteDataList[1]),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
+                };
+
+            answerDataIndex = 0;
+        }
+        // ABC Matrix_3x3 Shape Realistic
+        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[2]),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
+                };
+
+            answerDataIndex = 1;
+        }
+        // ABA Matrix_3x3 Shape Realistic
+        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                        new BoxData(0, BoxType.Question, spriteDataList[1]),
+                        new BoxData(0, BoxType.Question, spriteDataList[0]),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
+                };
+
+            answerDataIndex = 1;
+        }
+        // AAAA Matrix_1x7 Color Abstract
+        else if (questionData.pattern == QuestionPattern.AAAA && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], 0),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], 1),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], 2),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                };
+
+            answerDataIndex = 0;
+        }
+        // ABAB Matrix_1x7 Color Abstract
+        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], 2),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], 3),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], 0),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                };
+
+            answerDataIndex = 0;
+        }
+        // AABB Matrix_1x7 Color Abstract
+        else if (questionData.pattern == QuestionPattern.AABB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], 1),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], 2),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], 0),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], 1),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], 2),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                };
+
+            answerDataIndex = 1;
+        }
+        // ABC Matrix_3x3 Color Abstract
+        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 1),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 3),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], 1),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], 2),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], 3),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], 1),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], 2),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                };
+
+            answerDataIndex = 1;
+        }
+        // ABA Matrix_3x3 Color Abstract
+        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 2),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], 0),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], 0),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], 2),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], 3),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], 0),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], 2),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                };
+
+            answerDataIndex = 1;
+        }
+        // ABAB Matrix_1x7 Scale Abstract
+        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(2, BoxType.Choice, spriteDataList[1], answerColor, 0, 1),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], answerColor, 0, 1.5f),
+                    new BoxData(4, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
+                    new BoxData(5, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1.5f),
+                    new BoxData(6, BoxType.Choice, spriteDataList[4], GetRandomColorIndex(), 0, 1),
+                };
+
+            answerDataIndex = 0;
+        }
+        // AABB Matrix_1x7 Scale Abstract
+        else if (questionData.pattern == QuestionPattern.AABB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(2, BoxType.Choice, spriteDataList[1], answerColor, 0, 1),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], answerColor, 0, 1.5f),
+                    new BoxData(4, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
+                    new BoxData(5, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1.5f),
+                    new BoxData(6, BoxType.Choice, spriteDataList[4], GetRandomColorIndex(), 0, 1),
+                };
+
+            answerDataIndex = 1;
+        }
+        // AAB Matrix_1x7 Scale Abstract
+        else if (questionData.pattern == QuestionPattern.AAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
+            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            questionBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(0, BoxType.Answer, new SpriteData()),
+                };
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(2, BoxType.Choice, spriteDataList[1], answerColor, 0, 1),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], answerColor, 0, 1.5f),
+                    new BoxData(4, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
+                    new BoxData(5, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1.5f),
+                    new BoxData(6, BoxType.Choice, spriteDataList[4], GetRandomColorIndex(), 0, 1),
+                };
+
+            answerDataIndex = 0;
+        }
+        // ABA Matrix_3x3 Scale Abstract
+        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], answerColor, 0, 0.5f),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], answerColor, 0, 1),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], answerColor, 0, 1.5f),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1),
+                };
+
+            answerDataIndex = 0;
+        }
+        // ABC Matrix_3x3 Scale Abstract
+        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
+            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        {
+            // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
+            if (Utils.GetRandomBool())
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                    };
+            }
+            else
+            {
+                questionBoxDataList = new List<BoxData>
+                    {
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 1.5f),
+                        new BoxData(0, BoxType.Answer, new SpriteData()),
+                        new BoxData(0, BoxType.Question, spriteDataList[0], answerColor, 0, 0.5f),
+                    };
+            }
+
+            choiceBoxDataList = new List<BoxData>
+                {
+                    new BoxData(0, BoxType.Choice, spriteDataList[0], answerColor, 0, 1.5f),
+                    new BoxData(1, BoxType.Choice, spriteDataList[0], answerColor, 0, 1),
+                    new BoxData(2, BoxType.Choice, spriteDataList[0], answerColor, 0, 0.5f),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], answerColor, 0, 1),
+                    new BoxData(4, BoxType.Choice, spriteDataList[1], answerColor, 0, 1.5f),
+                    new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
+                    new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1),
+                };
+
+            answerDataIndex = 1;
+        }
+        else
+        {
+            Debug.Log("Failed SetRoundData()");
+        }
+
+        // choice 리스트 요소 셔플 (랜덤하게 섞음)
+        Utils.ShuffleList(choiceBoxDataList);
+
+        // 정답 인덱스 세팅
+        Managers.Game.currentAnswerDataIndex = answerDataIndex;
+    }
+}
+
