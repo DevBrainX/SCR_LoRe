@@ -11,6 +11,8 @@ public class TrainingScene : BaseScene
     [SerializeField] Sprite back_1x6;
     [SerializeField] Sprite back_1x7;
     [SerializeField] Sprite back_3x3;
+    [SerializeField] Sprite back_2x2x2;
+    [SerializeField] Sprite back_2x4;
 
     void Start()
     {
@@ -47,6 +49,18 @@ public class TrainingScene : BaseScene
         else if (_type == FieldType._1x6)
         {
             _fieldObj.GetComponent<SpriteRenderer>().sprite = back_1x6;
+        }
+        else if (_type == FieldType._2x2x2)
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_2x2x2;
+        }
+        else if (_type == FieldType._2x4)
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_2x4;
+        }
+        else
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_1x7;
         }
     }
 

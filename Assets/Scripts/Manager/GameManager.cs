@@ -27,18 +27,12 @@ public class GameManager : MonoBehaviour
     public GameObject questionField;
     public GameObject choiceField;
 
-    public BoxBehaviour answerBox;
-
-    //List<BoxData> questionBoxDataList;
-    //List<BoxData> choiceBoxDataList;
-
-    //List<BoxData> boxDataList;
-    //List<BoxData> prevBoxDataList;
     //List<SpriteData> spriteDataList;
     public List<SpriteData> prevSpriteDataList;
 
-    public List<BoxBehaviour> questionBoxList;
-    public List<BoxBehaviour> choiceBoxList;
+    List<BoxBehaviour> questionBoxList;
+    List<BoxBehaviour> choiceBoxList;
+    List<BoxBehaviour> answerBoxList;
 
     int currentChoiceIndex = -1;
 
@@ -48,7 +42,6 @@ public class GameManager : MonoBehaviour
     public int correctCount;
     public int wrongCount;
 
-    //List<int> questionDataIndex;
     public int currentAnswerDataIndex = 0;
 
     Coroutine roundCoroutine = null;
@@ -56,15 +49,10 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        //questionBoxDataList = new List<BoxData>();
-        //choiceBoxDataList = new List<BoxData>();
-
         questionBoxList = new List<BoxBehaviour>();
         choiceBoxList = new List<BoxBehaviour>();
+        answerBoxList = new List<BoxBehaviour>();
 
-        //boxDataList = new List<BoxData>();
-        //prevBoxDataList = new List<BoxData>();
-        //spriteDataList = new List<SpriteData>();
         prevSpriteDataList = new List<SpriteData>();
     }
 
@@ -128,15 +116,12 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator RoundLoop()
     {
-        ///////////////////////////////////////////////////////////////
-
-
         // 현재 라운드에 맞게 세팅하기 위한 정보들을 담고있는 클래스
         RoundData currentRoundData = null;
 
         switch (currentRound)
         {
-            case 1: currentRoundData = new Round05(); break;
+            case 1: currentRoundData = new Round06(); break;
             case 2: currentRoundData = new Round02(); break;
             case 3: currentRoundData = new Round03(); break;
             case 4: currentRoundData = new Round04(); break;
@@ -153,93 +138,113 @@ public class GameManager : MonoBehaviour
         // question 영역 스프라이트 세팅
         trainingScene.SetFieldSprite(questionField, currentRoundData.questionData.questionFieldType);
 
-        
-
-        // question 영역 스프라이트 크기
-        float spriteWidth = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
-        float spriteHeight = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
-
-        // question 영역을 스크린 좌표계로 환산
-        float xOffset = 1 - (spriteWidth / 2);
-        float yOffset = 1 - (spriteHeight / 2);
-
-        // 박스간의 간격
-        float spacing = 0.2f;
+        // question 박스 좌표들 담아놓은 리스트
+        List<Vector3> questionBoxPosList = new List<Vector3>();
+        SetBoxPosList(questionBoxPosList, currentRoundData.questionData.questionFieldType);
 
         // 문제 오브젝트 생성
-        Vector3 spawnPos = Vector3.zero;
         for (int i = 0; i < currentRoundData.questionBoxDataList.Count; ++i)
         {
-            // 자식 스프라이트의 크기
-            float childWidth = 100f / 100f; // (width 100 / screenRate 100)
-
-            // 1x6, 1x7 행렬일때 배치 세팅
-            if (currentRoundData.questionData.questionFieldType == FieldType._1x7
-                || currentRoundData.questionData.questionFieldType == FieldType._1x6)
-            {
-                // 간격에 맞춰서 생성 위치 세팅
-                spawnPos = new Vector3(xOffset + ((childWidth + spacing) * i), yOffset, 0);
-            }
-            // 3x3 행렬일때 배치 세팅
-            else if (currentRoundData.questionData.questionFieldType == FieldType._3x3)
-            {
-                // 행과 열 계산
-                int columns = 3;
-                int row = i / columns; // 현재 행
-                int col = i % columns; // 현재 열
-
-                // 간격에 맞춰서 생성 위치 세팅
-                spawnPos = new Vector3(xOffset + (childWidth + spacing) * col, yOffset + (childWidth + spacing) * row, 0);
-            }
-
             // 문제박스 생성
             GameObject newBox = Instantiate(boxPrefab, questionField.transform);
-            newBox.GetComponent<BoxBehaviour>().Init(currentRoundData.questionBoxDataList[i], spawnPos);
+            newBox.GetComponent<BoxBehaviour>().Init(currentRoundData.questionBoxDataList[i], questionBoxPosList[i]);
 
-            // 정답박스 타입일때는 지정
+            // 문제 박스 리스트에 저장
+            questionBoxList.Add(newBox.GetComponent<BoxBehaviour>());
+
+            // 정답박스 타입일때는 정답박스 리스트에도 따로 저장
             if (newBox.GetComponent<BoxBehaviour>().data.type == BoxType.Answer)
             {
-                answerBox = newBox.GetComponent<BoxBehaviour>();
+                answerBoxList.Add(newBox.GetComponent<BoxBehaviour>());
             }
-
-            questionBoxList.Add(newBox.GetComponent<BoxBehaviour>());
         }
-
 
         ///////////////////////////////////////////////////////////////
 
         // choice 영역 스프라이트 세팅
         trainingScene.SetFieldSprite(choiceField, currentRoundData.questionData.choiceFieldType);
 
-        // choice 영역 스프라이트 크기
-        spriteWidth = choiceField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
-        spriteHeight = choiceField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
-
-        // choice 영역을 스크린 좌표계로 환산
-        xOffset = 1 - (spriteWidth / 2);
-        yOffset = 1 - (spriteHeight / 2);
+        // question 박스 좌표들 담아놓은 리스트
+        List<Vector3> choiceBoxPosList = new List<Vector3>();
+        SetBoxPosList(choiceBoxPosList, currentRoundData.questionData.choiceFieldType);
 
         // choice 오브젝트 생성
         for (int i = 0; i < currentRoundData.choiceBoxDataList.Count; ++i)
         {
-            // 자식 스프라이트의 크기
-            float childWidth = 100f / 100f; // (width 100 / screenRate 100)
-
-            // 1x6, 1x7 행렬일때 배치 세팅
-            if (currentRoundData.questionData.choiceFieldType == FieldType._1x7
-                || currentRoundData.questionData.choiceFieldType == FieldType._1x6)
-            {
-                // 간격에 맞춰서 생성 위치 세팅
-                spawnPos = new Vector3(xOffset + ((childWidth + spacing) * i), yOffset, 0);
-            }
-
             // choice 박스 생성 (랜덤하게 섞어놓은 인덱스대로 배치)
             GameObject newBox = Instantiate(boxPrefab, choiceField.transform);
-            newBox.GetComponent<BoxBehaviour>().Init(currentRoundData.choiceBoxDataList[i], spawnPos);
+            newBox.GetComponent<BoxBehaviour>().Init(currentRoundData.choiceBoxDataList[i], choiceBoxPosList[i]);
+
+            // 선택 박스 리스트에 저장
             choiceBoxList.Add(newBox.GetComponent<BoxBehaviour>());
         }
 
         yield return null;
+    }
+
+    public void SetBoxPosList(List<Vector3> _list, FieldType _type)
+    {
+        // question 박스 좌표들 담아놓은 리스트
+        List<Vector3> boxPosList = null;
+
+        if (_type == FieldType._1x7)
+        {
+            boxPosList = new List<Vector3>()
+            {
+                new Vector3(-3.6f, 0, 0),
+                new Vector3(-2.4f, 0, 0),
+                new Vector3(-1.2f, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(1.2f, 0, 0),
+                new Vector3(2.4f, 0, 0),
+                new Vector3(3.6f, 0, 0),
+            };
+        }
+        else if (_type == FieldType._1x6)
+        {
+            boxPosList = new List<Vector3>()
+            {
+                new Vector3(-3f, 0, 0),
+                new Vector3(-1.8f, 0, 0),
+                new Vector3(-0.6f, 0, 0),
+                new Vector3(0.6f, 0, 0),
+                new Vector3(1.8f, 0, 0),
+                new Vector3(3f, 0, 0),
+            };
+        }
+        else if (_type == FieldType._3x3)
+        {
+            boxPosList = new List<Vector3>()
+            {
+                new Vector3(-1.2f, 1.2f, 0), new Vector3(0, 1.2f, 0), new Vector3(1.2f, 1.2f, 0),
+                new Vector3(-1.2f, 0, 0), new Vector3(0, 0, 0), new Vector3(1.2f, 0, 0),
+                new Vector3(-1.2f, -1.2f, 0), new Vector3(0, -1.2f, 0), new Vector3(1.2f, -1.2f, 0),
+            };
+        }
+        else if (_type == FieldType._2x2x2)
+        {
+            boxPosList = new List<Vector3>()
+            {
+                // 1
+                new Vector3(-2.0f, 0.6f, 0), new Vector3(-0.8f, 0.6f, 0),
+                new Vector3(-2.0f, -0.6f, 0), new Vector3(-0.8f, -0.6f, 0),
+                // 2
+                new Vector3(0.8f, 0.6f, 0), new Vector3(2.0f, 0.6f, 0),
+                new Vector3(0.8f, -0.6f, 0), new Vector3(2.0f, -0.6f, 0),
+            };
+        }
+        else if (_type == FieldType._2x4)
+        {
+            boxPosList = new List<Vector3>()
+            {
+                new Vector3(-1.8f, 0.6f, 0), new Vector3(-0.6f, 0.6f, 0),
+                new Vector3(0.6f, 0.6f, 0), new Vector3(1.8f, 0.6f, 0),
+                new Vector3(-1.8f, -0.6f, 0), new Vector3(-0.6f, -0.6f, 0),
+                new Vector3(0.6f, -0.6f, 0), new Vector3(1.8f, -0.6f, 0),
+            };
+        }
+
+        _list.AddRange(boxPosList);
     }
 
     public void InsertInAnswerBox(BoxBehaviour _box)

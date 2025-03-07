@@ -17,11 +17,11 @@ public enum FieldType
     _1x7,
     _3x3,
     _1x6,
-    //_2x4,
+    _2x2x2,
+    _2x4,
     //_2x6,
-    //Field_1x4x2,
-    //Field_2x2x2,
-    //Field_2x2x3,
+    //_1x4x2,
+    //_2x2x3,
 }
 
 public enum QuestionCategory
@@ -34,6 +34,7 @@ public enum QuestionCategory
     Rotation_180,
     Plus,
     Minus,
+    Group,
 }
 
 public enum QuestionSpriteType

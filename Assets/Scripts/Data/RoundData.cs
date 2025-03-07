@@ -32,7 +32,7 @@ public class RoundData
     }
 
     // spriteDataList 에 랜덤하게 스프라이트 데이터를 생성해서 저장해놓음
-    public void SetRandomSpriteDataList(QuestionSpriteType _type, int _count)
+    public void SetRandomSpriteDataList()
     {
         // 데이터 컨테이너 초기화
         spriteDataList = new List<SpriteData>();
@@ -40,6 +40,17 @@ public class RoundData
 
         // 랜덤 인덱스를 저장할 BoxData
         SpriteData data = null;
+
+        // Choice Field Type에 따라서 랜덤 스프라이트 개수 설정
+        int _count = -1;
+        if (questionData.choiceFieldType == FieldType._1x6)
+            _count = 6;
+        else if (questionData.choiceFieldType == FieldType._1x7)
+            _count = 7;
+        else if (questionData.choiceFieldType == FieldType._3x3)
+            _count = 5;
+        else if (questionData.choiceFieldType == FieldType._2x4)
+            _count = 8;
 
         for (int i = 0; i < _count; ++i)
         {
@@ -51,7 +62,7 @@ public class RoundData
             {
                 data = new SpriteData();
 
-                if (_type == QuestionSpriteType.Realistic)
+                if (questionData.spriteType == QuestionSpriteType.Realistic)
                 {
                     data.type = QuestionSpriteType.Realistic;
                     data.category = Random.Range(0, Managers.Resource.realSpriteList.Count);
@@ -135,7 +146,7 @@ public class RoundData
         }
 
         // 문제데이터에 사용될 스프라이트 인덱스 랜덤하게 세팅
-        SetRandomSpriteDataList(questionData.spriteType, 7);
+        SetRandomSpriteDataList();
 
         // 정답의 색상
         int answerColor = GetRandomColorIndex();
@@ -151,26 +162,26 @@ public class RoundData
             && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
-                {
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(0, BoxType.Answer, new SpriteData()),
-                };
+            {
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
 
             choiceBoxDataList = new List<BoxData>
-                {
-                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
-                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
-                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
-                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
-                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
-                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
-                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
-                };
+            {
+                new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                new BoxData(6, BoxType.Choice, spriteDataList[6]),
+            };
 
             answerDataIndex = 0;
         }
@@ -181,26 +192,26 @@ public class RoundData
             && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
-                {
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(1, BoxType.Question, spriteDataList[1]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(1, BoxType.Question, spriteDataList[1]),
-                    new BoxData(0, BoxType.Question, spriteDataList[0]),
-                    new BoxData(1, BoxType.Question, spriteDataList[1]),
-                    new BoxData(0, BoxType.Answer, new SpriteData()),
-                };
+            {
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(1, BoxType.Question, spriteDataList[1]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(1, BoxType.Question, spriteDataList[1]),
+                new BoxData(0, BoxType.Question, spriteDataList[0]),
+                new BoxData(1, BoxType.Question, spriteDataList[1]),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
 
             choiceBoxDataList = new List<BoxData>
-                {
-                    new BoxData(0, BoxType.Choice, spriteDataList[0]),
-                    new BoxData(1, BoxType.Choice, spriteDataList[1]),
-                    new BoxData(2, BoxType.Choice, spriteDataList[2]),
-                    new BoxData(3, BoxType.Choice, spriteDataList[3]),
-                    new BoxData(4, BoxType.Choice, spriteDataList[4]),
-                    new BoxData(5, BoxType.Choice, spriteDataList[5]),
-                    new BoxData(6, BoxType.Choice, spriteDataList[6]),
-                };
+            {
+                new BoxData(0, BoxType.Choice, spriteDataList[0]),
+                new BoxData(1, BoxType.Choice, spriteDataList[1]),
+                new BoxData(2, BoxType.Choice, spriteDataList[2]),
+                new BoxData(3, BoxType.Choice, spriteDataList[3]),
+                new BoxData(4, BoxType.Choice, spriteDataList[4]),
+                new BoxData(5, BoxType.Choice, spriteDataList[5]),
+                new BoxData(6, BoxType.Choice, spriteDataList[6]),
+            };
 
             answerDataIndex = 0;
         }
@@ -815,6 +826,39 @@ public class RoundData
             };
 
             answerDataIndex = 1;
+        }
+        // None Group Abstract _2x2x2 _2x4
+        else if (questionData.pattern == QuestionPattern.None
+            && questionData.category == QuestionCategory.Group
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._2x2x2 && questionData.choiceFieldType == FieldType._2x4)
+        {
+            questionBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
+
+            choiceBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Choice, spriteDataList[0], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[4], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[5], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[6], GetRandomColorIndex()),
+                new BoxData(0, BoxType.Choice, spriteDataList[7], GetRandomColorIndex()),
+            };
+
+            answerDataIndex = 0;
         }
         else
         {
