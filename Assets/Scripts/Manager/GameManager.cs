@@ -136,10 +136,12 @@ public class GameManager : MonoBehaviour
 
         switch (currentRound)
         {
-            case 1: currentRoundData = new Round01(); break;
+            case 1: currentRoundData = new Round05(); break;
             case 2: currentRoundData = new Round02(); break;
             case 3: currentRoundData = new Round03(); break;
-            default: currentRoundData = new Round03(); break;
+            case 4: currentRoundData = new Round04(); break;
+            case 5: currentRoundData = new Round05(); break;
+            default: currentRoundData = new Round04(); break;
         }
 
         currentRoundData.Init();
@@ -148,17 +150,18 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
-
         // question 영역 스프라이트 세팅
-        trainingScene.SetQuestionFieldSprite(currentRoundData.questionData.matrixType);
+        trainingScene.SetFieldSprite(questionField, currentRoundData.questionData.questionFieldType);
+
+        
 
         // question 영역 스프라이트 크기
-        float questionSpriteWidth = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
-        float questionSpriteHeight = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
+        float spriteWidth = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        float spriteHeight = questionField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
 
         // question 영역을 스크린 좌표계로 환산
-        float xOffset = 1 - (questionSpriteWidth / 2);
-        float yOffset = 1 - (questionSpriteHeight / 2);
+        float xOffset = 1 - (spriteWidth / 2);
+        float yOffset = 1 - (spriteHeight / 2);
 
         // 박스간의 간격
         float spacing = 0.2f;
@@ -170,14 +173,15 @@ public class GameManager : MonoBehaviour
             // 자식 스프라이트의 크기
             float childWidth = 100f / 100f; // (width 100 / screenRate 100)
 
-            // 1x7 행렬일때 배치 세팅
-            if (currentRoundData.questionData.matrixType == QuestionMatrixType.Matrix_1x7)
+            // 1x6, 1x7 행렬일때 배치 세팅
+            if (currentRoundData.questionData.questionFieldType == FieldType._1x7
+                || currentRoundData.questionData.questionFieldType == FieldType._1x6)
             {
                 // 간격에 맞춰서 생성 위치 세팅
                 spawnPos = new Vector3(xOffset + ((childWidth + spacing) * i), yOffset, 0);
             }
             // 3x3 행렬일때 배치 세팅
-            else if (currentRoundData.questionData.matrixType == QuestionMatrixType.Matrix_3x3)
+            else if (currentRoundData.questionData.questionFieldType == FieldType._3x3)
             {
                 // 행과 열 계산
                 int columns = 3;
@@ -204,12 +208,16 @@ public class GameManager : MonoBehaviour
 
         ///////////////////////////////////////////////////////////////
 
+        // choice 영역 스프라이트 세팅
+        trainingScene.SetFieldSprite(choiceField, currentRoundData.questionData.choiceFieldType);
 
         // choice 영역 스프라이트 크기
-        float choiceSpriteWidth = choiceField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        spriteWidth = choiceField.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        spriteHeight = choiceField.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
 
         // choice 영역을 스크린 좌표계로 환산
-        xOffset = 1 - (choiceSpriteWidth / 2);
+        xOffset = 1 - (spriteWidth / 2);
+        yOffset = 1 - (spriteHeight / 2);
 
         // choice 오브젝트 생성
         for (int i = 0; i < currentRoundData.choiceBoxDataList.Count; ++i)
@@ -217,8 +225,13 @@ public class GameManager : MonoBehaviour
             // 자식 스프라이트의 크기
             float childWidth = 100f / 100f; // (width 100 / screenRate 100)
 
-            // 간격에 맞춰서 생성 위치 세팅
-            spawnPos = new Vector3(xOffset + ((childWidth + 0.2f) * i), 0, 0);
+            // 1x6, 1x7 행렬일때 배치 세팅
+            if (currentRoundData.questionData.choiceFieldType == FieldType._1x7
+                || currentRoundData.questionData.choiceFieldType == FieldType._1x6)
+            {
+                // 간격에 맞춰서 생성 위치 세팅
+                spawnPos = new Vector3(xOffset + ((childWidth + spacing) * i), yOffset, 0);
+            }
 
             // choice 박스 생성 (랜덤하게 섞어놓은 인덱스대로 배치)
             GameObject newBox = Instantiate(boxPrefab, choiceField.transform);
@@ -247,6 +260,7 @@ public class GameManager : MonoBehaviour
         answerBox.data.colorIndex = _box.data.colorIndex;
         answerBox.data.angle = _box.data.angle;
         answerBox.data.scale = _box.data.scale;
+        answerBox.data.number = _box.data.number;
 
         answerBox.SetImageProperties();
     }
@@ -265,8 +279,9 @@ public class GameManager : MonoBehaviour
             //answerBox.data.spriteCategoryIndex = -1;
             //answerBox.data.spriteIndex = -1;
             answerBox.data.colorIndex = -1;
-            answerBox.data.angle = 0;
-            answerBox.data.scale = 0;
+            answerBox.data.angle = 0f;
+            answerBox.data.scale = 1f;
+            answerBox.data.number = -1;
 
             answerBox.SetImageProperties();
         }

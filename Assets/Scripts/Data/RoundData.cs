@@ -144,9 +144,11 @@ public class RoundData
 
         // 문제 데이터 리스트, 선택지 데이터 리스트 세팅
 
-        // AAAA Matrix_1x7 Shape Realistic
-        if (questionData.pattern == QuestionPattern.AAAA && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        // AAAA Shape Realistic _1x7 _1x7
+        if (questionData.pattern == QuestionPattern.AAAA
+            && questionData.category == QuestionCategory.Shape
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -172,9 +174,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // ABAB Matrix_1x7 Shape Realistic
-        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        // ABAB Shape Realistic _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.ABAB
+            && questionData.category == QuestionCategory.Shape
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -200,9 +204,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // ABC Matrix_3x3 Shape Realistic
-        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        // ABC Shape Realistic _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Shape
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
             if (Utils.GetRandomBool())
@@ -249,9 +255,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // ABA Matrix_3x3 Shape Realistic
-        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Shape && questionData.spriteType == QuestionSpriteType.Realistic)
+        // ABA Shape Realistic _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABA
+            && questionData.category == QuestionCategory.Shape
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
             if (Utils.GetRandomBool())
@@ -298,9 +306,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // AAAA Matrix_1x7 Color Abstract
-        else if (questionData.pattern == QuestionPattern.AAAA && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        // AAAA Color Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.AAAA
+            && questionData.category == QuestionCategory.Color
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -318,7 +328,7 @@ public class RoundData
                     new BoxData(0, BoxType.Choice, spriteDataList[0], 0),
                     new BoxData(1, BoxType.Choice, spriteDataList[0], 1),
                     new BoxData(2, BoxType.Choice, spriteDataList[0], 2),
-                    new BoxData(3, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], 0),
                     new BoxData(4, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
                     new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
                     new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
@@ -326,9 +336,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // ABAB Matrix_1x7 Color Abstract
-        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABAB Color Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.ABAB
+            && questionData.category == QuestionCategory.Color
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -346,7 +358,7 @@ public class RoundData
                     new BoxData(0, BoxType.Choice, spriteDataList[0], 2),
                     new BoxData(1, BoxType.Choice, spriteDataList[0], 3),
                     new BoxData(2, BoxType.Choice, spriteDataList[0], 0),
-                    new BoxData(3, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
+                    new BoxData(3, BoxType.Choice, spriteDataList[1], 2),
                     new BoxData(4, BoxType.Choice, spriteDataList[1], GetRandomColorIndex()),
                     new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex()),
                     new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex()),
@@ -354,9 +366,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // AABB Matrix_1x7 Color Abstract
-        else if (questionData.pattern == QuestionPattern.AABB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        // AABB Color Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.AABB
+            && questionData.category == QuestionCategory.Color
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -382,9 +396,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // ABC Matrix_3x3 Color Abstract
-        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABC Color Abstract _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Color
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
             if (Utils.GetRandomBool())
@@ -431,9 +447,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // ABA Matrix_3x3 Color Abstract
-        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Color && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABA Color Abstract _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABA
+            && questionData.category == QuestionCategory.Color
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
             if (Utils.GetRandomBool())
@@ -480,9 +498,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // ABAB Matrix_1x7 Scale Abstract
-        else if (questionData.pattern == QuestionPattern.ABAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABAB Scale Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.ABAB
+            && questionData.category == QuestionCategory.Scale
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -508,9 +528,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // AABB Matrix_1x7 Scale Abstract
-        else if (questionData.pattern == QuestionPattern.AABB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        // AABB Scale Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.AABB
+            && questionData.category == QuestionCategory.Scale
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -536,9 +558,11 @@ public class RoundData
 
             answerDataIndex = 1;
         }
-        // AAB Matrix_1x7 Scale Abstract
-        else if (questionData.pattern == QuestionPattern.AAB && questionData.matrixType == QuestionMatrixType.Matrix_1x7
-            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        // AAB Scale Abstract _1x7 _1x7
+        else if (questionData.pattern == QuestionPattern.AAB
+            && questionData.category == QuestionCategory.Scale
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._1x7 && questionData.choiceFieldType == FieldType._1x7)
         {
             questionBoxDataList = new List<BoxData>
                 {
@@ -564,9 +588,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // ABA Matrix_3x3 Scale Abstract
-        else if (questionData.pattern == QuestionPattern.ABA && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABA Scale Abstract _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABA
+            && questionData.category == QuestionCategory.Scale
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (3 or 5)
             if (Utils.GetRandomBool())
@@ -613,9 +639,11 @@ public class RoundData
 
             answerDataIndex = 0;
         }
-        // ABC Matrix_3x3 Scale Abstract
-        else if (questionData.pattern == QuestionPattern.ABC && questionData.matrixType == QuestionMatrixType.Matrix_3x3
-            && questionData.category == QuestionCategory.Scale && questionData.spriteType == QuestionSpriteType.Abstract)
+        // ABC Scale Abstract _3x3 _1x7
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Scale
+            && questionData.spriteType == QuestionSpriteType.Abstract
+            && questionData.questionFieldType == FieldType._3x3 && questionData.choiceFieldType == FieldType._1x7)
         {
             // 50% 확률로 정답칸 위치 인덱스 설정 (1 or 7)
             if (Utils.GetRandomBool())
@@ -659,6 +687,132 @@ public class RoundData
                     new BoxData(5, BoxType.Choice, spriteDataList[2], GetRandomColorIndex(), 0, 1),
                     new BoxData(6, BoxType.Choice, spriteDataList[3], GetRandomColorIndex(), 0, 1),
                 };
+
+            answerDataIndex = 1;
+        }
+        // ABC Plus None _1x6 _1x6
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Plus
+            && questionData.spriteType == QuestionSpriteType.None
+            && questionData.questionFieldType == FieldType._1x6 && questionData.choiceFieldType == FieldType._1x6)
+        {
+            // 정답 숫자(연산 문제용)
+            int answerNumber = Random.Range(20, 41);
+            int numberDifference = Random.Range(1, 4);
+
+            questionBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 5)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 4)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 3)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 2)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 1)),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
+
+            choiceBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 2)),
+                new BoxData(1, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 1)),
+                new BoxData(2, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber),
+                new BoxData(3, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 1)),
+                new BoxData(4, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 2)),
+                new BoxData(5, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 3)),
+            };
+
+            answerDataIndex = 2;
+        }
+        // ABC Minus None _1x6 _1x6
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Minus
+            && questionData.spriteType == QuestionSpriteType.None
+            && questionData.questionFieldType == FieldType._1x6 && questionData.choiceFieldType == FieldType._1x6)
+        {
+            // 정답 숫자(연산 문제용)
+            int answerNumber = Random.Range(20, 41);
+            int numberDifference = Random.Range(1, 4);
+
+            questionBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 5)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 4)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 3)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 2)),
+                new BoxData(0, BoxType.Question, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 1)),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
+
+            choiceBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 2)),
+                new BoxData(1, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber - (numberDifference * 1)),
+                new BoxData(2, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber),
+                new BoxData(3, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 1)),
+                new BoxData(4, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 2)),
+                new BoxData(5, BoxType.Choice, new SpriteData(), -1, 0, 1, answerNumber + (numberDifference * 3)),
+            };
+
+            answerDataIndex = 2;
+        }
+        // ABC Rotation_180 Realistic _1x6 _1x7
+        else if (questionData.pattern == QuestionPattern.ABC
+            && questionData.category == QuestionCategory.Rotation_180
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._1x6 && questionData.choiceFieldType == FieldType._1x7)
+        {
+            float rotateAngle = 180f;
+
+            questionBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, 0),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, rotateAngle),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, 0),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, rotateAngle),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, 0),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
+
+            choiceBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Choice, spriteDataList[0], -1, 0),
+                new BoxData(1, BoxType.Choice, spriteDataList[0], -1, rotateAngle),
+                new BoxData(2, BoxType.Choice, spriteDataList[1], -1, 0),
+                new BoxData(3, BoxType.Choice, spriteDataList[1], -1, rotateAngle),
+                new BoxData(4, BoxType.Choice, spriteDataList[2], -1, 0),
+                new BoxData(5, BoxType.Choice, spriteDataList[3], -1, rotateAngle),
+                new BoxData(6, BoxType.Choice, spriteDataList[4], -1, rotateAngle),
+            };
+
+            answerDataIndex = 1;
+        }
+        // ABAB Rotation_90 Realistic _1x6 _1x7
+        else if (questionData.pattern == QuestionPattern.ABAB
+            && questionData.category == QuestionCategory.Rotation_90
+            && questionData.spriteType == QuestionSpriteType.Realistic
+            && questionData.questionFieldType == FieldType._1x6 && questionData.choiceFieldType == FieldType._1x7)
+        {
+            float rotateAngle = 90f;
+
+            questionBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, 0),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, rotateAngle * 1),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, rotateAngle * 2),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, rotateAngle * 3),
+                new BoxData(0, BoxType.Question, spriteDataList[0], -1, 0),
+                new BoxData(0, BoxType.Answer, new SpriteData()),
+            };
+
+            choiceBoxDataList = new List<BoxData>
+            {
+                new BoxData(0, BoxType.Choice, spriteDataList[0], -1, 0),
+                new BoxData(1, BoxType.Choice, spriteDataList[0], -1, rotateAngle * 1),
+                new BoxData(2, BoxType.Choice, spriteDataList[0], -1, rotateAngle * 2),
+                new BoxData(3, BoxType.Choice, spriteDataList[0], -1, rotateAngle * 3),
+                new BoxData(4, BoxType.Choice, spriteDataList[1], -1, 0),
+                new BoxData(5, BoxType.Choice, spriteDataList[1], -1, rotateAngle * 1),
+                new BoxData(6, BoxType.Choice, spriteDataList[2], -1, rotateAngle * 2),
+            };
 
             answerDataIndex = 1;
         }

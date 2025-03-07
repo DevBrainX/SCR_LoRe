@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Color = UnityEngine.Color;
@@ -5,8 +6,9 @@ using Color = UnityEngine.Color;
 
 public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public SpriteRenderer image;
-    public SpriteRenderer outline;
+    [SerializeField] SpriteRenderer image;
+    [SerializeField] SpriteRenderer outline;
+    [SerializeField] TextMeshPro number;
 
     [HideInInspector] public BoxData data;
 
@@ -41,10 +43,11 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     {
         SetOriginalPosition();
 
-        if (data.type != BoxType.Answer)
-        {
-            SetImageProperties();
-        }
+        //if (data.type != BoxType.Answer)
+        //{
+        //    SetImageProperties();
+        //}
+        SetImageProperties();
     }
 
     public void SetImageProperties()
@@ -53,6 +56,7 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         SetColor();
         SetRotation();
         SetScale();
+        SetNumber();
     }
 
     public void SetSprite()
@@ -96,12 +100,25 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void SetRotation()
     {
-        image.transform.localRotation = Quaternion.Euler(0, data.angle, 0);
+        image.transform.localRotation = Quaternion.Euler(0, 0, data.angle);
     }
 
     public void SetScale()
     {
         image.transform.localScale = new Vector3(100f / 512f * data.scale, 100f / 512f * data.scale, 1f);
+    }
+
+    public void SetNumber()
+    {
+        if (data.number > 0)
+        {
+            number.gameObject.SetActive(true);
+            number.text = (data.number).ToString();
+        }
+        else
+        {
+            number.gameObject.SetActive(false);
+        }
     }
 
     public void SetOutlineColor(Color _color)

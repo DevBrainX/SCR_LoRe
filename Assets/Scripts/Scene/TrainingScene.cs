@@ -8,6 +8,7 @@ public class TrainingScene : BaseScene
     [SerializeField] GameObject questionField;
     [SerializeField] GameObject choiceField;
 
+    [SerializeField] Sprite back_1x6;
     [SerializeField] Sprite back_1x7;
     [SerializeField] Sprite back_3x3;
 
@@ -33,12 +34,20 @@ public class TrainingScene : BaseScene
         Managers.Game.choiceField = choiceField;
     }
 
-    public void SetQuestionFieldSprite(QuestionMatrixType _matrixType)
+    public void SetFieldSprite(GameObject _fieldObj, FieldType _type)
     {
-        if (_matrixType == QuestionMatrixType.Matrix_1x7)
-            questionField.GetComponent<SpriteRenderer>().sprite = back_1x7;
-        else if (_matrixType == QuestionMatrixType.Matrix_3x3)
-            questionField.GetComponent<SpriteRenderer>().sprite = back_3x3;
+        if (_type == FieldType._1x7)
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_1x7;
+        }
+        else if (_type == FieldType._3x3)
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_3x3;
+        }
+        else if (_type == FieldType._1x6)
+        {
+            _fieldObj.GetComponent<SpriteRenderer>().sprite = back_1x6;
+        }
     }
 
     //public void SetActiveStartPage()

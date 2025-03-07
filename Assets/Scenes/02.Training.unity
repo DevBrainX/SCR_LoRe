@@ -2520,6 +2520,7 @@ MonoBehaviour:
   roundPage: {fileID: 2091536812}
   questionField: {fileID: 569918685}
   choiceField: {fileID: 1519040136}
+  back_1x6: {fileID: 21300000, guid: 768cb1591df77a148a7a6949e07b1520, type: 3}
   back_1x7: {fileID: 21300000, guid: c9f613f0d5296cd44aa4f531c913a00e, type: 3}
   back_3x3: {fileID: 21300000, guid: b2ba9fdcb6bf9d5429c01c2920414503, type: 3}
 --- !u!1 &1725552984

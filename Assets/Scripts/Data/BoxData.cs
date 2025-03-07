@@ -1,5 +1,4 @@
 ﻿using System;
-using static UnityEditor.U2D.ScriptablePacker;
 
 public enum BoxType
 {
@@ -44,6 +43,7 @@ public class BoxData
     public int colorIndex;
     public float angle;
     public float scale;
+    public int number;
 
     public BoxData()
     {
@@ -56,10 +56,11 @@ public class BoxData
         colorIndex = (int)ColorIndex.White;
         angle = 0f;
         scale = 1f;
+        number = -1;
     }
 
     public BoxData(int _index, BoxType _type, SpriteData _spriteData,
-        int _colorIndex = -1, float _angle = 0f, float _scale = 1f)
+        int _colorIndex = -1, float _angle = 0f, float _scale = 1f, int _number = -1)
     {
         index = _index;
         type = _type;
@@ -70,6 +71,7 @@ public class BoxData
         colorIndex = _colorIndex;
         angle = _angle;
         scale = _scale;
+        number = _number;
     }
 
     //public void SetData(BoxData _data)

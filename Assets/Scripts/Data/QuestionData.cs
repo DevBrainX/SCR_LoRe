@@ -11,11 +11,17 @@ public enum QuestionPattern
     AAB,
 }
 
-public enum QuestionMatrixType
+public enum FieldType
 {
     None = -1,
-    Matrix_1x7 = 0,
-    Matrix_3x3,
+    _1x7,
+    _3x3,
+    _1x6,
+    //_2x4,
+    //_2x6,
+    //Field_1x4x2,
+    //Field_2x2x2,
+    //Field_2x2x3,
 }
 
 public enum QuestionCategory
@@ -24,7 +30,8 @@ public enum QuestionCategory
     Shape = 0,
     Color,
     Scale,
-    Rotation,
+    Rotation_90,
+    Rotation_180,
     Plus,
     Minus,
 }
@@ -40,18 +47,20 @@ public class QuestionData
 {
     public int index;
     public QuestionPattern pattern;
-    public QuestionMatrixType matrixType;
     public QuestionCategory category;
     public QuestionSpriteType spriteType;
+    public FieldType questionFieldType;
+    public FieldType choiceFieldType;
 
-    public QuestionData(int _index, QuestionPattern _pattern, QuestionMatrixType _matrixType,
-        QuestionCategory _category, QuestionSpriteType _spriteType)
+    public QuestionData(int _index, QuestionPattern _pattern, QuestionCategory _category,
+        QuestionSpriteType _spriteType, FieldType _questionFieldType, FieldType _choiceFieldType)
     {
         index = _index;
         pattern = _pattern;
-        matrixType = _matrixType;
         category = _category;
         spriteType = _spriteType;
+        questionFieldType = _questionFieldType;
+        choiceFieldType = _choiceFieldType;
     }
 
     //public void SetData(QuestionData _data)
@@ -65,6 +74,6 @@ public class QuestionData
     // 디버깅용 함수
     public override string ToString()
     {
-        return $"Index: {index}, Pattern: {pattern}, MatrixType: {matrixType}, Category: {category}, SpriteType: {spriteType}";
+        return $"Index: {index}, Pattern: {pattern}, Category: {category}, SpriteType: {spriteType}, QuestionField: {questionFieldType}, ChoiceField: {choiceFieldType}";
     }
 }
