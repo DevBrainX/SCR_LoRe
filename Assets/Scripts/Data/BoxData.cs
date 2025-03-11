@@ -36,10 +36,9 @@ public class BoxData
 {
     public int index;
     public BoxType type;
+    public int inDataIndex;
+
     public SpriteData spriteData;
-    //public QuestionSpriteType spriteType;
-    //public int spriteCategoryIndex;
-    //public int spriteIndex;
     public int colorIndex;
     public float angle;
     public float scale;
@@ -49,14 +48,9 @@ public class BoxData
     {
         index = -1;
         type = BoxType.None;
-        spriteData = new SpriteData();
-        //spriteType = QuestionSpriteType.None;
-        //spriteCategoryIndex = -1;
-        //spriteIndex = -1;
-        colorIndex = (int)ColorIndex.White;
-        angle = 0f;
-        scale = 1f;
-        number = -1;
+        inDataIndex = -1;
+
+        SetEmptyData();
     }
 
     public BoxData(int _index, BoxType _type, SpriteData _spriteData,
@@ -64,26 +58,38 @@ public class BoxData
     {
         index = _index;
         type = _type;
+        inDataIndex = -1;
+
         spriteData = _spriteData;
-        //spriteType = _spriteType;
-        //spriteCategoryIndex = _spriteCategoryIndex;
-        //spriteIndex = _spriteIndex;
         colorIndex = _colorIndex;
         angle = _angle;
         scale = _scale;
         number = _number;
     }
 
-    //public void SetData(BoxData _data)
-    //{
-    //    index = _data.index;
-    //    type = _data.type;
-    //    spriteData = _data.spriteData;
-    //    //spriteType = _data.spriteType;
-    //    //spriteCategoryIndex = _data.spriteCategoryIndex;
-    //    //spriteIndex = _data.spriteIndex;
-    //    colorIndex = _data.colorIndex;
-    //    angle = _data.angle;
-    //    scale = _data.scale;
-    //}
+    public void SetEmptyData()
+    {
+        //index = _data.index;
+        //type = _data.type;
+        inDataIndex = -1;
+
+        spriteData = new SpriteData();
+        colorIndex = (int)ColorIndex.White;
+        angle = 0f;
+        scale = 1f;
+        number = -1;
+    }
+
+    public void SetAnswerData(BoxData _data)
+    {
+        //index = _data.index;
+        //type = _data.type;
+        inDataIndex = _data.index;
+
+        spriteData = _data.spriteData;
+        colorIndex = _data.colorIndex;
+        angle = _data.angle;
+        scale = _data.scale;
+        number = _data.number;
+    }
 }

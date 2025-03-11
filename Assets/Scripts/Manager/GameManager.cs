@@ -32,7 +32,12 @@ public class GameManager : MonoBehaviour
 
     List<BoxBehaviour> questionBoxList;
     List<BoxBehaviour> choiceBoxList;
-    List<BoxBehaviour> answerBoxList;
+    //List<BoxBehaviour> answerBoxList;
+
+    public BoxBehaviour currentDraggingBox;
+
+    public List<SlotData> answerSlotList;
+    public List<SlotData> choiceSlotList;
 
     int currentChoiceIndex = -1;
 
@@ -49,11 +54,14 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        prevSpriteDataList = new List<SpriteData>();
+
         questionBoxList = new List<BoxBehaviour>();
         choiceBoxList = new List<BoxBehaviour>();
-        answerBoxList = new List<BoxBehaviour>();
+        //answerBoxList = new List<BoxBehaviour>();
 
-        prevSpriteDataList = new List<SpriteData>();
+        answerSlotList = new List<SlotData>();
+        choiceSlotList = new List<SlotData>();
     }
 
     void Start()
@@ -95,6 +103,9 @@ public class GameManager : MonoBehaviour
         // 선택했던 인덱스 초기화
         currentChoiceIndex = -1;
 
+        answerSlotList.Clear();
+        choiceSlotList.Clear();
+
         // UI 초기화
         Managers.Ui.trainingUi.SetProgressText();
         Managers.Ui.trainingUi.SetCheckText(string.Empty);
@@ -121,7 +132,7 @@ public class GameManager : MonoBehaviour
 
         switch (currentRound)
         {
-            case 1: currentRoundData = new Round06(); break;
+            case 1: currentRoundData = new Round01(); break;
             case 2: currentRoundData = new Round02(); break;
             case 3: currentRoundData = new Round03(); break;
             case 4: currentRoundData = new Round04(); break;
@@ -142,6 +153,9 @@ public class GameManager : MonoBehaviour
         List<Vector3> questionBoxPosList = new List<Vector3>();
         SetBoxPosList(questionBoxPosList, currentRoundData.questionData.questionFieldType);
 
+        // choiceSlot Data 인덱스 설정용
+        int answerSlotCount = 0;
+
         // 문제 오브젝트 생성
         for (int i = 0; i < currentRoundData.questionBoxDataList.Count; ++i)
         {
@@ -152,10 +166,12 @@ public class GameManager : MonoBehaviour
             // 문제 박스 리스트에 저장
             questionBoxList.Add(newBox.GetComponent<BoxBehaviour>());
 
-            // 정답박스 타입일때는 정답박스 리스트에도 따로 저장
+            // 정답 박스 타입일때는 정답 슬롯 리스트에도 저장
             if (newBox.GetComponent<BoxBehaviour>().data.type == BoxType.Answer)
             {
-                answerBoxList.Add(newBox.GetComponent<BoxBehaviour>());
+                Vector3 worldPos = questionField.transform.TransformPoint(questionBoxPosList[i]);
+                answerSlotList.Add(new SlotData(answerSlotCount, worldPos));
+                answerSlotCount++;
             }
         }
 
@@ -164,9 +180,12 @@ public class GameManager : MonoBehaviour
         // choice 영역 스프라이트 세팅
         trainingScene.SetFieldSprite(choiceField, currentRoundData.questionData.choiceFieldType);
 
-        // question 박스 좌표들 담아놓은 리스트
+        // choice 박스 좌표들 담아놓은 리스트
         List<Vector3> choiceBoxPosList = new List<Vector3>();
         SetBoxPosList(choiceBoxPosList, currentRoundData.questionData.choiceFieldType);
+
+        // choiceSlot Data 인덱스 설정용
+        int choiceSlotCount = 0;
 
         // choice 오브젝트 생성
         for (int i = 0; i < currentRoundData.choiceBoxDataList.Count; ++i)
@@ -177,6 +196,12 @@ public class GameManager : MonoBehaviour
 
             // 선택 박스 리스트에 저장
             choiceBoxList.Add(newBox.GetComponent<BoxBehaviour>());
+            newBox.GetComponent<BoxBehaviour>().slotIndex = i;
+
+            // 선택 슬롯 리스트에도 저장
+            Vector3 worldPos = choiceField.transform.TransformPoint(choiceBoxPosList[i]);
+            choiceSlotList.Add(new SlotData(choiceSlotCount, worldPos, true));
+            choiceSlotCount++;
         }
 
         yield return null;
@@ -247,27 +272,65 @@ public class GameManager : MonoBehaviour
         _list.AddRange(boxPosList);
     }
 
-    public void InsertInAnswerBox(BoxBehaviour _box)
+    public SlotData GetAnswerSlot()
     {
-        if (currentChoiceIndex != -1)
+        // 비어있는 AnswerSlot 중 가장 앞의 것을 리턴
+        for (int i = 0; i < answerSlotList.Count; ++i)
         {
-            choiceBoxList[currentChoiceIndex].gameObject.SetActive(true);
+            if (answerSlotList[i].hasBox == false)
+            {
+                return answerSlotList[i];
+            }
         }
 
-        currentChoiceIndex = choiceBoxList.IndexOf(_box);
-        choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
+        // 들어있는 AnswerSlot 중 가장 앞의 것을 리턴
+        return answerSlotList[0];
+    }
 
-        //answerBox.SetData(_box.data);
-        answerBox.data.spriteData = _box.data.spriteData;
-        //answerBox.data.spriteType = _box.data.spriteType;
-        //answerBox.data.spriteCategoryIndex = _box.data.spriteCategoryIndex;
-        //answerBox.data.spriteIndex = _box.data.spriteIndex;
-        answerBox.data.colorIndex = _box.data.colorIndex;
-        answerBox.data.angle = _box.data.angle;
-        answerBox.data.scale = _box.data.scale;
-        answerBox.data.number = _box.data.number;
+    public SlotData GetEmptyChoiceSlot()
+    {
+        // 비어있는 ChoiceSlot 중 가장 앞의 것을 리턴
+        for (int i = 0; i < choiceSlotList.Count; ++i)
+        {
+            if (choiceSlotList[i].hasBox == false)
+            {
+                return choiceSlotList[i];
+            }
+        }
 
-        answerBox.SetImageProperties();
+        // null을 리턴하는 경우는 없음. 있으면 오류.
+        return null;
+    }
+
+    //public SlotData GetFrontAnswerSlot()
+    //{
+    //    // 들어있는 AnswerSlot 중 가장 앞의 것을 리턴
+    //    return answerSlotList[0];
+    //}
+
+    public void InsertInAnswerSlot(BoxBehaviour _box)
+    {
+        //if (currentChoiceIndex != -1)
+        //{
+        //    choiceBoxList[currentChoiceIndex].gameObject.SetActive(true);
+        //}
+
+        //currentChoiceIndex = choiceBoxList.IndexOf(_box);
+        //choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
+
+        ////answerBox.SetData(_box.data);
+        //answerBox.data.spriteData = _box.data.spriteData;
+        //answerBox.data.colorIndex = _box.data.colorIndex;
+        //answerBox.data.angle = _box.data.angle;
+        //answerBox.data.scale = _box.data.scale;
+        //answerBox.data.number = _box.data.number;
+
+        //answerBox.SetImageProperties();
+
+
+        //SlotData answerSlot = GetAnswerSlot();
+        //answerBox.SetAnswerData(_box);
+        //answerBox.SetImageProperties();
     }
 
     public void RemoveInAnswerBox()
@@ -279,16 +342,16 @@ public class GameManager : MonoBehaviour
 
             currentChoiceIndex = -1;
 
-            //answerBox.SetData(new BoxData());
-            answerBox.data.spriteData = new SpriteData();
-            //answerBox.data.spriteCategoryIndex = -1;
-            //answerBox.data.spriteIndex = -1;
-            answerBox.data.colorIndex = -1;
-            answerBox.data.angle = 0f;
-            answerBox.data.scale = 1f;
-            answerBox.data.number = -1;
 
-            answerBox.SetImageProperties();
+
+            ////answerBox.SetData(new BoxData());
+            //answerBox.data.spriteData = new SpriteData();
+            //answerBox.data.colorIndex = -1;
+            //answerBox.data.angle = 0f;
+            //answerBox.data.scale = 1f;
+            //answerBox.data.number = -1;
+
+            //answerBox.SetImageProperties();
         }
     }
 
@@ -303,13 +366,13 @@ public class GameManager : MonoBehaviour
         if (choiceBoxList[currentChoiceIndex].data.index == currentAnswerDataIndex)
         {
             Managers.Ui.trainingUi.SetCheckText("Correct");
-            answerBox.SetOutlineColor(Color.green);
+            //answerBox.SetOutlineColor(Color.green);
             correctCount++;
         }
         else
         {
             Managers.Ui.trainingUi.SetCheckText("Wrong");
-            answerBox.SetOutlineColor(Color.red);
+            //answerBox.SetOutlineColor(Color.red);
             wrongCount++;
         }
 
