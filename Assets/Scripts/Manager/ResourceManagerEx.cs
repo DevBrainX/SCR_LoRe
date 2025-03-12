@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class ResourceManagerEx : MonoBehaviour
@@ -12,8 +11,6 @@ public class ResourceManagerEx : MonoBehaviour
     {
         InitRealisticSpriteList();
         InitAbstractSpriteList();
-
-        //Debug.Log(realSpriteList.Count);
     }
 
     void InitRealisticSpriteList()
@@ -21,24 +18,29 @@ public class ResourceManagerEx : MonoBehaviour
         // 사실적 스프라이트 리스트 세팅
         realSpriteList = new List<List<Sprite>>();
 
-        // 폴더 내의 하위 폴더 목록 가져오기
-        string folderPath = Path.Combine(Application.dataPath, "Resources/Sprites/Realistic");
-        string[] subDirectories = Directory.GetDirectories(folderPath);
+        int index = 0;
 
-        // 폴더의 갯수만큼 for문 돌리기
-        for (int i = 0; i < subDirectories.Length; ++i)
+        // 폴더가 존재하지 않을 때까지 반복
+        while (true)
         {
-            List<Sprite> spriteList = new List<Sprite>();
-
             // Resources 폴더 내의 스프라이트 로드
-            Sprite[] loadedSprites = Resources.LoadAll<Sprite>($"Sprites/Realistic/{i}");
+            Sprite[] loadedSprites = Resources.LoadAll<Sprite>("Sprites/Realistic/" + index);
 
-            // 로드한 스프라이트를 리스트에 추가
-            spriteList.AddRange(loadedSprites);
+            // 스프라이트가 로드되지 않았다면 반복 종료
+            if (loadedSprites.Length == 0)
+            {
+                break; // 폴더가 없거나 스프라이트가 없으면 종료
+            }
 
-            // 다차원 리스트에 추가
+            // 스프라이트 리스트 생성 및 추가
+            List<Sprite> spriteList = new List<Sprite>(loadedSprites);
             realSpriteList.Add(spriteList);
+
+            // 다음 폴더로 이동
+            index++;
         }
+
+        Logger.Log("Complete InitRealisticSpriteList()");
     }
 
     void InitAbstractSpriteList()
@@ -46,23 +48,28 @@ public class ResourceManagerEx : MonoBehaviour
         // 추상적 스프라이트 리스트 세팅
         abstSpriteList = new List<List<Sprite>>();
 
-        // 폴더 내의 하위 폴더 목록 가져오기
-        string folderPath = Path.Combine(Application.dataPath, "Resources/Sprites/Abstract");
-        string[] subDirectories = Directory.GetDirectories(folderPath);
+        int index = 0;
 
-        // 폴더의 갯수만큼 for문 돌리기
-        for (int i = 0; i < subDirectories.Length; ++i)
+        // 폴더가 존재하지 않을 때까지 반복
+        while (true)
         {
-            List<Sprite> spriteList = new List<Sprite>();
-
             // Resources 폴더 내의 스프라이트 로드
-            Sprite[] loadedSprites = Resources.LoadAll<Sprite>($"Sprites/Abstract/{i}");
+            Sprite[] loadedSprites = Resources.LoadAll<Sprite>("Sprites/Abstract/" + index);
 
-            // 로드한 스프라이트를 리스트에 추가
-            spriteList.AddRange(loadedSprites);
+            // 스프라이트가 로드되지 않았다면 반복 종료
+            if (loadedSprites.Length == 0)
+            {
+                break; // 폴더가 없거나 스프라이트가 없으면 종료
+            }
 
-            // 다차원 리스트에 추가
+            // 스프라이트 리스트 생성 및 추가
+            List<Sprite> spriteList = new List<Sprite>(loadedSprites);
             abstSpriteList.Add(spriteList);
+
+            // 다음 폴더로 이동
+            index++;
         }
+
+        Logger.Log("Complete InitAbstractSpriteList()");
     }
 }
