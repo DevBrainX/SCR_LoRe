@@ -2523,7 +2523,7 @@ MonoBehaviour:
   back_1x6: {fileID: 21300000, guid: 768cb1591df77a148a7a6949e07b1520, type: 3}
   back_1x7: {fileID: 21300000, guid: c9f613f0d5296cd44aa4f531c913a00e, type: 3}
   back_3x3: {fileID: 21300000, guid: b2ba9fdcb6bf9d5429c01c2920414503, type: 3}
-  back_2x2x2: {fileID: 21300000, guid: 57b698fe1b1cd1549a9c3bfc151f1f1e, type: 3}
+  back_2x2x2: {fileID: 21300000, guid: 4a63ca8c421ba1342a6ec33cbb0bf45d, type: 3}
   back_2x4: {fileID: 21300000, guid: 0aac8c646609e1a40904d0d7c39ef4e0, type: 3}
 --- !u!1 &1725552984
 GameObject:

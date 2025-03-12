@@ -46,19 +46,19 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         //SetOriginalPosition();
         transform.localPosition = initialPos;
 
-        //if (data.type != BoxType.Answer)
-        //{
-        //    SetImageProperties();
-        //}
         SetImageProperties();
     }
 
     public void SetImageProperties()
     {
-        SetSprite();
-        SetColor();
-        SetRotation();
-        SetScale();
+        if (data.type != BoxType.Answer)
+        {
+            SetSprite();
+            SetColor();
+            SetRotation();
+            SetScale();
+        }
+
         SetNumber();
     }
 
@@ -66,7 +66,7 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     {
         if (data.spriteData.category == -1 || data.spriteData.index == -1)
         {
-            image.sprite = null;
+            //image.sprite = null;
         }
         else
         {
@@ -218,7 +218,7 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             if (!isInAnswerSlot)
             {
                 SlotData answerSlot = Managers.Game.GetAnswerSlot();
-                transform.position = answerSlot.pos;
+                transform.position = answerSlot.pos + new Vector3(0, 0, -0.1f); // 위에 덮기위해 z값 추가
                 answerSlot.hasBox = true;
 
                 Managers.Game.choiceSlotList[slotIndex].hasBox = false;

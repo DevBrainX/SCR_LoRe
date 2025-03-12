@@ -153,6 +153,8 @@ MonoBehaviour:
   image: {fileID: 523621846870285781}
   outline: {fileID: 2546635650211658633}
   number: {fileID: 4274883297316527303}
+  isInAnswerSlot: 0
+  slotIndex: -1
   doubleClickTime: 0.3
 --- !u!1 &4728460168130160095
 GameObject:
@@ -493,7 +495,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 579b9278f4163334699982e1d9e96c0b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -501,6 +503,6 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
 
         switch (currentRound)
         {
-            case 1: currentRoundData = new Round01(); break;
+            case 1: currentRoundData = new Round06(); break;
             case 2: currentRoundData = new Round02(); break;
             case 3: currentRoundData = new Round03(); break;
             case 4: currentRoundData = new Round04(); break;
@@ -251,11 +251,11 @@ public class GameManager : MonoBehaviour
             boxPosList = new List<Vector3>()
             {
                 // 1
-                new Vector3(-2.0f, 0.6f, 0), new Vector3(-0.8f, 0.6f, 0),
-                new Vector3(-2.0f, -0.6f, 0), new Vector3(-0.8f, -0.6f, 0),
+                new Vector3(-2.3f, 0.6f, 0), new Vector3(-1.1f, 0.6f, 0),
+                new Vector3(-2.3f, -0.6f, 0), new Vector3(-1.1f, -0.6f, 0),
                 // 2
-                new Vector3(0.8f, 0.6f, 0), new Vector3(2.0f, 0.6f, 0),
-                new Vector3(0.8f, -0.6f, 0), new Vector3(2.0f, -0.6f, 0),
+                new Vector3(1.1f, 0.6f, 0), new Vector3(2.3f, 0.6f, 0),
+                new Vector3(1.1f, -0.6f, 0), new Vector3(2.3f, -0.6f, 0),
             };
         }
         else if (_type == FieldType._2x4)
