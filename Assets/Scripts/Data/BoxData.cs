@@ -1,4 +1,5 @@
 ﻿using System;
+using static UnityEditor.U2D.ScriptablePacker;
 
 public enum BoxType
 {
@@ -20,23 +21,40 @@ public enum ColorIndex
 
 public class SpriteData
 {
-    public QuestionSpriteType type;
+    public SpriteType type;
     public int category;
     public int index;
 
     public SpriteData()
     {
-        type = QuestionSpriteType.None;
+        type = SpriteType.None;
         category = -1;
         index = -1;
+    }
+
+    public void SetData(SpriteData _data)
+    {
+        type = _data.type;
+        category = _data.category;
+        index = _data.index;
+    }
+
+    public bool IsSameData(SpriteData _data)
+    {
+        if (type == _data.type
+            && category == _data.category
+            && index == _data.index)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
 
 public class BoxData
 {
-    public int index;
     public BoxType type;
-    public int inDataIndex;
 
     public SpriteData spriteData;
     public int colorIndex;
@@ -46,19 +64,15 @@ public class BoxData
 
     public BoxData()
     {
-        index = -1;
         type = BoxType.None;
-        inDataIndex = -1;
 
         SetEmptyData();
     }
 
-    public BoxData(int _index, BoxType _type, SpriteData _spriteData,
+    public BoxData(BoxType _type, SpriteData _spriteData,
         int _colorIndex = -1, float _angle = 0f, float _scale = 1f, int _number = -1)
     {
-        index = _index;
         type = _type;
-        inDataIndex = -1;
 
         spriteData = _spriteData;
         colorIndex = _colorIndex;
@@ -69,9 +83,7 @@ public class BoxData
 
     public void SetEmptyData()
     {
-        //index = _data.index;
         //type = _data.type;
-        inDataIndex = -1;
 
         spriteData = new SpriteData();
         colorIndex = (int)ColorIndex.White;
@@ -82,14 +94,27 @@ public class BoxData
 
     public void SetAnswerData(BoxData _data)
     {
-        //index = _data.index;
         //type = _data.type;
-        inDataIndex = _data.index;
 
-        spriteData = _data.spriteData;
+        spriteData = new SpriteData();
+        spriteData.SetData(_data.spriteData);
         colorIndex = _data.colorIndex;
         angle = _data.angle;
         scale = _data.scale;
         number = _data.number;
+    }
+
+    public bool IsSameData(BoxData _data)
+    {
+        if (spriteData.IsSameData(_data.spriteData)
+            && colorIndex == _data.colorIndex
+            && angle == _data.angle
+            && scale == _data.scale
+            && number == _data.number)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneManagerEx : MonoBehaviour
+public class SceneManagerEx
 {
     public BaseScene CurrentScene { get { return GameObject.FindAnyObjectByType<BaseScene>(); } }
 

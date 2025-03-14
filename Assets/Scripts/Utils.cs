@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public static class Utils
 {
@@ -9,7 +11,7 @@ public static class Utils
         return randomNumber == 1;
     }
 
-    public static void ShuffleList<T>(List<T> _list)
+    public static void ShuffleList<T>(this List<T> _list)
     {
         System.Random rng = new System.Random();
         int n = _list.Count;
@@ -19,6 +21,21 @@ public static class Utils
             T temp = _list[n];
             _list[n] = _list[k];
             _list[k] = temp;
+        }
+    }
+
+    public static void ClearList<T>(this List<T> _list)
+    {
+        if (_list == null)
+        {
+            return;
+        }
+
+        // 리스트의 개수를 체크
+        if (_list.Count > 0)
+        {
+            // null이 아닌 요소들만 남기기
+            _list.RemoveAll(item => item == null);
         }
     }
 

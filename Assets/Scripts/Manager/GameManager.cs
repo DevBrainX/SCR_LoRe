@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
     public int correctCount;
     public int wrongCount;
 
-    public int currentAnswerDataIndex = 0;
+    //public int currentAnswerDataIndex = 0;
 
     Coroutine roundCoroutine = null;
 
@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
 
         switch (currentRound)
         {
-            case 1: currentRoundData = new Round06(); break;
+            case 1: currentRoundData = new Round01(); break;
             case 2: currentRoundData = new Round02(); break;
             case 3: currentRoundData = new Round03(); break;
             case 4: currentRoundData = new Round04(); break;
@@ -200,7 +200,7 @@ public class GameManager : MonoBehaviour
 
             // 선택 슬롯 리스트에도 저장
             Vector3 worldPos = choiceField.transform.TransformPoint(choiceBoxPosList[i]);
-            choiceSlotList.Add(new SlotData(choiceSlotCount, worldPos, true));
+            choiceSlotList.Add(new SlotData(choiceSlotCount, worldPos));
             choiceSlotCount++;
         }
 
@@ -277,7 +277,7 @@ public class GameManager : MonoBehaviour
         // 비어있는 AnswerSlot 중 가장 앞의 것을 리턴
         for (int i = 0; i < answerSlotList.Count; ++i)
         {
-            if (answerSlotList[i].hasBox == false)
+            if (answerSlotList[i].placedBox == null)
             {
                 return answerSlotList[i];
             }
@@ -292,7 +292,7 @@ public class GameManager : MonoBehaviour
         // 비어있는 ChoiceSlot 중 가장 앞의 것을 리턴
         for (int i = 0; i < choiceSlotList.Count; ++i)
         {
-            if (choiceSlotList[i].hasBox == false)
+            if (choiceSlotList[i].placedBox == null)
             {
                 return choiceSlotList[i];
             }
@@ -302,36 +302,30 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    //public SlotData GetFrontAnswerSlot()
+    //public void InsertInAnswerSlot(BoxBehaviour _box)
     //{
-    //    // 들어있는 AnswerSlot 중 가장 앞의 것을 리턴
-    //    return answerSlotList[0];
+    //if (currentChoiceIndex != -1)
+    //{
+    //    choiceBoxList[currentChoiceIndex].gameObject.SetActive(true);
     //}
 
-    public void InsertInAnswerSlot(BoxBehaviour _box)
-    {
-        //if (currentChoiceIndex != -1)
-        //{
-        //    choiceBoxList[currentChoiceIndex].gameObject.SetActive(true);
-        //}
+    //currentChoiceIndex = choiceBoxList.IndexOf(_box);
+    //choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
 
-        //currentChoiceIndex = choiceBoxList.IndexOf(_box);
-        //choiceBoxList[currentChoiceIndex].gameObject.SetActive(false);
+    ////answerBox.SetData(_box.data);
+    //answerBox.data.spriteData = _box.data.spriteData;
+    //answerBox.data.colorIndex = _box.data.colorIndex;
+    //answerBox.data.angle = _box.data.angle;
+    //answerBox.data.scale = _box.data.scale;
+    //answerBox.data.number = _box.data.number;
 
-        ////answerBox.SetData(_box.data);
-        //answerBox.data.spriteData = _box.data.spriteData;
-        //answerBox.data.colorIndex = _box.data.colorIndex;
-        //answerBox.data.angle = _box.data.angle;
-        //answerBox.data.scale = _box.data.scale;
-        //answerBox.data.number = _box.data.number;
-
-        //answerBox.SetImageProperties();
+    //answerBox.SetImageProperties();
 
 
-        //SlotData answerSlot = GetAnswerSlot();
-        //answerBox.SetAnswerData(_box);
-        //answerBox.SetImageProperties();
-    }
+    //SlotData answerSlot = GetAnswerSlot();
+    //answerBox.SetAnswerData(_box);
+    //answerBox.SetImageProperties();
+    //}
 
     public void RemoveInAnswerBox()
     {
@@ -363,18 +357,18 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (choiceBoxList[currentChoiceIndex].data.index == currentAnswerDataIndex)
-        {
-            Managers.Ui.trainingUi.SetCheckText("Correct");
-            //answerBox.SetOutlineColor(Color.green);
-            correctCount++;
-        }
-        else
-        {
-            Managers.Ui.trainingUi.SetCheckText("Wrong");
-            //answerBox.SetOutlineColor(Color.red);
-            wrongCount++;
-        }
+        //if (choiceBoxList[currentChoiceIndex].data.index == currentAnswerDataIndex) 
+        //{
+        //    Managers.Ui.trainingUi.SetCheckText("Correct");
+        //    //answerBox.SetOutlineColor(Color.green);
+        //    correctCount++;
+        //}
+        //else
+        //{
+        //    Managers.Ui.trainingUi.SetCheckText("Wrong");
+        //    //answerBox.SetOutlineColor(Color.red);
+        //    wrongCount++;
+        //}
 
         currentQuestionCount++;
 

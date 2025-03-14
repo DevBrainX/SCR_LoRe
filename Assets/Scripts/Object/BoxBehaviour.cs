@@ -70,11 +70,11 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
         else
         {
-            if (data.spriteData.type == QuestionSpriteType.Realistic)
+            if (data.spriteData.type == SpriteType.Realistic)
             {
                 image.sprite = Managers.Resource.realSpriteList[data.spriteData.category][data.spriteData.index];
             }
-            else if (data.spriteData.type == QuestionSpriteType.Abstract)
+            else if (data.spriteData.type == SpriteType.Abstract)
             {
                 image.sprite = Managers.Resource.abstSpriteList[data.spriteData.category][data.spriteData.index];
             }
@@ -131,6 +131,8 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        /*
+        
         if (data.type != BoxType.Choice)
         {
             return;
@@ -142,10 +144,14 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         // 마우스 시작 위치 저장
         dragStartPos = Camera.main.ScreenToWorldPoint(eventData.position);
         dragStartPos.z = initialPos.z; // Z축을 현재 오브젝트의 Z축으로 설정
+
+        */
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        /*
+        
         if (data.type != BoxType.Choice)
         {
             return;
@@ -161,10 +167,14 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         // 오브젝트 위치 업데이트
         transform.position = initialPos + delta;
+
+        */
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        /*
+        
         if (data.type != BoxType.Choice)
         {
             return;
@@ -183,6 +193,8 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         //}
 
         //SetOriginalPosition();
+
+        */
     }
 
     void OnMouseUp()
@@ -214,28 +226,27 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         if (data.type == BoxType.Choice)
         {
-            // 슬롯에 들어있지않을때 -> Answer Slot으로 이동
-            if (!isInAnswerSlot)
-            {
-                SlotData answerSlot = Managers.Game.GetAnswerSlot();
-                transform.position = answerSlot.pos + new Vector3(0, 0, -0.1f); // 위에 덮기위해 z값 추가
-                answerSlot.hasBox = true;
+            //// 슬롯에 들어있지않을때 -> Answer Slot으로 이동
+            //if (!isInAnswerSlot)
+            //{
+            //    SlotData answerSlot = Managers.Game.GetAnswerSlot();
+            //    answerSlot.hasBox = true;
 
-                Managers.Game.choiceSlotList[slotIndex].hasBox = false;
-                isInAnswerSlot = true;
-                slotIndex = answerSlot.index;
-            }
-            // 슬롯에 들어있을때 -> Choice Slot으로 이동
-            else
-            {
-                SlotData choiceSlot = Managers.Game.GetEmptyChoiceSlot();
-                transform.position = choiceSlot.pos;
-                choiceSlot.hasBox = true;
+            //    Managers.Game.choiceSlotList[slotIndex].hasBox = false;
+            //    isInAnswerSlot = true;
+            //    slotIndex = answerSlot.index;
+            //}
+            //// 슬롯에 들어있을때 -> Choice Slot으로 이동
+            //else
+            //{
+            //    SlotData choiceSlot = Managers.Game.GetEmptyChoiceSlot();
+            //    transform.position = choiceSlot.pos;
+            //    choiceSlot.hasBox = true;
 
-                Managers.Game.answerSlotList[slotIndex].hasBox = false;
-                isInAnswerSlot = false;
-                slotIndex = choiceSlot.index;
-            }
+            //    Managers.Game.answerSlotList[slotIndex].hasBox = false;
+            //    isInAnswerSlot = false;
+            //    slotIndex = choiceSlot.index;
+            //}
         }
     }
 
@@ -247,6 +258,18 @@ public class BoxBehaviour : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
 
         return false;
+    }
+
+    public void PlaceOnSlot(SlotData _slot)
+    {
+        // 슬롯 위치로 이동, 위에 덮기위해 z값 추가
+        transform.position = _slot.pos + new Vector3(0, 0, -0.1f);
+        _slot.placedBox = this;
+    }
+
+    public void RemoveOnSlot(SlotData _slot)
+    {
+
     }
 
     //public void SetOriginalPosition()

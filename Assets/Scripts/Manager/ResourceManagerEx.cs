@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceManagerEx : MonoBehaviour
+public class ResourceManagerEx
 {
     // 2개 합쳐서 3중 리스트로 할수도 있지만, 너무 난잡함
     public List<List<Sprite>> realSpriteList;
     public List<List<Sprite>> abstSpriteList;
 
-    void Start()
+    public void Init()
     {
         InitRealisticSpriteList();
         InitAbstractSpriteList();
     }
 
-    void InitRealisticSpriteList()
+    private void InitRealisticSpriteList()
     {
         // 사실적 스프라이트 리스트 세팅
         realSpriteList = new List<List<Sprite>>();
@@ -43,7 +43,7 @@ public class ResourceManagerEx : MonoBehaviour
         Logger.Log("Complete InitRealisticSpriteList()");
     }
 
-    void InitAbstractSpriteList()
+    private void InitAbstractSpriteList()
     {
         // 추상적 스프라이트 리스트 세팅
         abstSpriteList = new List<List<Sprite>>();

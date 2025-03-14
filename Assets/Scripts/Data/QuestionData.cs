@@ -11,19 +11,6 @@ public enum QuestionPattern
     AAB,
 }
 
-public enum FieldType
-{
-    None = -1,
-    _1x7,
-    _3x3,
-    _1x6,
-    _2x2x2,
-    _2x4,
-    //_2x6,
-    //_1x4x2,
-    //_2x2x3,
-}
-
 public enum QuestionCategory
 {
     None = -1,
@@ -37,11 +24,24 @@ public enum QuestionCategory
     Group,
 }
 
-public enum QuestionSpriteType
+public enum SpriteType
 {
     None = -1,
     Realistic = 0,
     Abstract,
+}
+
+public enum FieldType
+{
+    None = -1,
+    _1x7,
+    _3x3,
+    _1x6,
+    _2x2x2,
+    _2x4,
+    //_2x6,
+    //_1x4x2,
+    //_2x2x3,
 }
 
 public class QuestionData
@@ -49,12 +49,12 @@ public class QuestionData
     public int index;
     public QuestionPattern pattern;
     public QuestionCategory category;
-    public QuestionSpriteType spriteType;
+    public SpriteType spriteType;
     public FieldType questionFieldType;
     public FieldType choiceFieldType;
 
     public QuestionData(int _index, QuestionPattern _pattern, QuestionCategory _category,
-        QuestionSpriteType _spriteType, FieldType _questionFieldType, FieldType _choiceFieldType)
+        SpriteType _spriteType, FieldType _questionFieldType, FieldType _choiceFieldType)
     {
         index = _index;
         pattern = _pattern;
